@@ -66,6 +66,7 @@
     <EditText
         android:id="@+id/editTextUsername"
         android:layout_width="0dp"
+        android:paddingStart="10dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -73,7 +74,8 @@
         android:background="@drawable/bt_forget_pass_bg"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name"
+        android:hint="'@username"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -91,7 +93,7 @@
         app:layout_constraintTop_toBottomOf="@+id/editTextUsername" />
 
     <EditText
-        android:id="@+id/editTextPhone"
+        android:id="@+id/editTextEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -99,37 +101,12 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/bt_forget_pass_bg"
         android:ems="10"
-        android:inputType="phone"
+        android:inputType="textEmailAddress"
+        android:paddingStart="10dp"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
-
-    <TextView
-        android:id="@+id/textViewGetCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/archivo_narrow"
-        android:text="Get verification code"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
-
-    <EditText
-        android:id="@+id/editTextVerifyCode"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="160dp"
-        android:background="@drawable/bt_forget_pass_bg"
-        android:ems="10"
-        android:inputType="number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewGetCode" />
 
     <EditText
         android:id="@+id/editTextTextPassword2"
@@ -140,7 +117,9 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/bt_forget_pass_bg"
         android:ems="10"
+        android:paddingStart="10dp"
         android:inputType="textPassword"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -149,24 +128,13 @@
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="32dp"
         android:fontFamily="@font/archivo_narrow"
         android:text="Password"
         android:textColor="@color/white"
         android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/textViewGetCode"
-        app:layout_constraintTop_toBottomOf="@+id/editTextVerifyCode" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/buttonVerify"
-        android:background="@drawable/bt_forget_pass_bg"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:text="verify"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editTextVerifyCode"
-        app:layout_constraintTop_toTopOf="@+id/editTextVerifyCode" />
+        app:layout_constraintStart_toStartOf="@+id/textView6"
+        app:layout_constraintTop_toBottomOf="@+id/editTextEmail" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonRegister"
@@ -174,27 +142,10 @@
         android:layout_height="50dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/bt_login_bg"
-        android:enabled="false"
         android:text="Register"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/textViewVerify"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:cursorVisible="false"
-        android:fontFamily="@font/archivo_narrow"
-        android:text="Verification successful"
-        android:textColor="@color/teal_200"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextVerifyCode" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

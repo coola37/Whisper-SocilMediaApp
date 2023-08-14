@@ -21,6 +21,7 @@
             android:layout_height="match_parent">
 
             <ImageView
+                android:id="@+id/imgLogo"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:src="@drawable/newlogo"
@@ -88,7 +89,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <EditText
-        android:id="@+id/editTextTextLoginInfo"
+        android:id="@+id/editTextLoginInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -96,16 +97,18 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/bt_forget_pass_bg"
         android:ems="10"
+        android:paddingStart="10dp"
         android:hint="Email, phone or username"
         android:inputType="textPersonName"
         android:padding="10dp"
+        android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <EditText
-        android:id="@+id/editTextTextPassword"
+        android:id="@+id/editTextPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -114,15 +117,16 @@
         android:background="@drawable/bt_forget_pass_bg"
         android:ems="10"
         android:hint="Password"
+        android:paddingStart="10dp"
         android:inputType="textPassword"
         android:padding="10dp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextLoginInfo" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextLoginInfo" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -135,7 +139,7 @@
         app:layout_constraintBottom_toTopOf="@+id/view5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@+id/textViewRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

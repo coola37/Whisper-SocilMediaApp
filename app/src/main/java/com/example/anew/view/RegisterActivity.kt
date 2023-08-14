@@ -3,139 +3,87 @@ package com.example.anew.view
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
+import android.widget.Toast
 import com.example.anew.R
-import com.google.firebase.FirebaseException
-import com.google.firebase.FirebaseTooManyRequestsException
+import com.example.anew.model.UserDetails
+import com.example.anew.model.Users
 import com.google.firebase.auth.*
-import org.w3c.dom.Text
-import java.util.concurrent.TimeUnit
+import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var editTextUserame: EditText
-    private lateinit var editTextPhone: EditText
-    private lateinit var editTextVerifyCode: EditText
+    private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
-    private lateinit var textViewGetCode: TextView
-    private lateinit var buttonVerify: Button
-    private lateinit var auth: FirebaseAuth
     private lateinit var buttonRegister: Button
 
-    private var storedVerificationId: String? = null
-    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
-    private lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
+    @Inject
+    internal lateinit var auth: FirebaseAuth
+    @Inject
+    internal lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        initializeViews()
+
+        buttonRegister.setOnClickListener {
+            GlobalScope.launch(Dispatchers.Main) {
+                performRegister()
+            }
+        }
+    }
+
+    private fun initializeViews() {
         editTextUserame = findViewById(R.id.editTextUsername)
-        editTextPhone = findViewById(R.id.editTextPhone)
-        editTextVerifyCode = findViewById(R.id.editTextVerifyCode)
+        editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextTextPassword2)
-        textViewGetCode = findViewById(R.id.textViewGetCode)
-        buttonVerify = findViewById(R.id.buttonVerify)
         buttonRegister = findViewById(R.id.buttonRegister)
-
-        auth = FirebaseAuth.getInstance()
-
-
-
-        textViewGetCode.setOnClickListener {
-            sendVerificationCode(editTextPhone.text.toString())
-        }
-
-        buttonVerify.setOnClickListener {
-            if(editTextVerifyCode.text.toString().isNotEmpty()){
-                val credential : PhoneAuthCredential = PhoneAuthProvider.getCredential(
-                    storedVerificationId!!, editTextVerifyCode.text.toString())
-                signInWithPhoneAuthCredential(credential)
-            }
-        }
-
-
-
-        callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
-            override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-
-                    Log.e("TAG", "onVerificationCompleted:$credential")
-
-
-            }
-
-            override fun onVerificationFailed(e: FirebaseException) {
-                // This callback is invoked in an invalid request for verification is made,
-                // for instance if the the phone number format is not valid.
-                Log.w("TAG", "onVerificationFailed", e)
-
-                if (e is FirebaseAuthInvalidCredentialsException) {
-                    // Invalid request
-                } else if (e is FirebaseTooManyRequestsException) {
-                    // The SMS quota for the project has been exceeded
-                } else if (e is FirebaseAuthMissingActivityForRecaptchaException) {
-                    // reCAPTCHA verification attempted with null Activity
-                }
-
-                // Show a message and update the UI
-            }
-
-            override fun onCodeSent(
-                verificationId: String,
-                token: PhoneAuthProvider.ForceResendingToken,
-            ) {
-                // The SMS verification code has been sent to the provided phone number, we
-                // now need to ask the user to enter the code and then construct a credential
-                // by combining the code with a verification ID.
-                Log.e("TAG", "onCodeSent:$verificationId")
-
-                // Save verification ID and resending token so we can use them later
-                storedVerificationId = verificationId
-                resendToken = token
-            }
-        }
-
-
-
     }
 
+    private suspend fun performRegister() {
+        val email = editTextEmail.text.toString()
+        val username = "@${editTextUserame.text.toString()}"
+        val password = editTextPassword.text.toString()
 
+        try {
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            authResult.user?.sendEmailVerification()?.await()
 
-    private fun sendVerificationCode(number: String){
-        val options = PhoneAuthOptions.newBuilder(auth)
-            .setPhoneNumber(number) // Phone number to verify
-            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-            .setActivity(this) // Activity (for callback binding)
-            .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
-            .build()
-        PhoneAuthProvider.verifyPhoneNumber(options)
+            saveDb(authResult.user?.uid.toString(), username, email)
+
+            Toast.makeText(
+                this,
+                "You can log in after verifying your account with the link sent to your e-mail address.",
+                Toast.LENGTH_SHORT
+            ).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "The user could not be created.", Toast.LENGTH_SHORT).show()
+            Log.e("performRegister", e.toString())
+        }
     }
 
-    private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
+    private suspend fun saveDb(uId: String, username: String, email: String) {
+        val usersCollection = db.collection("users")
+        val userId = auth.uid.toString()
+        val detail = UserDetails("", "")
+        val user = Users(uId, username, email, detail)
 
-                    Log.e("TAG", "signInWithCredential:success")
-
-                    buttonRegister.isEnabled = true
-                    var textView: TextView = findViewById(R.id.textViewVerify)
-                    textView.visibility = View.VISIBLE
-                    val user = task.result?.user
-
-
-                } else {
-                    // Sign in failed, display a message and update the UI
-                    Log.e("TAG", "signInWithCredential:failure", task.exception)
-                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                        // The verification code entered was invalid
-                    }
-                    // Update UI
-                }
-            }
+        try {
+            usersCollection.document(userId).set(user).await()
+            Log.e("saveDb", "successful")
+        } catch (e: Exception) {
+            Log.e("saveDb", e.toString())
+        }
     }
 }
