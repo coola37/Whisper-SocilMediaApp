@@ -1,7 +1,11 @@
 package com.example.anew.hilt
 
+import android.app.Application
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,7 +14,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object FirebaseModule {
+object ModuleApp {
 
     @Provides
     @Singleton
@@ -23,4 +27,18 @@ object FirebaseModule {
     fun provideAuth() : FirebaseAuth {
         return FirebaseAuth.getInstance()
     }
+
+    @Provides
+    @Singleton
+    fun provideStorage() :FirebaseStorage{
+        return FirebaseStorage.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGlideInstance (application: Application): RequestManager{
+        return Glide.with(application)
+    }
+
+
 }

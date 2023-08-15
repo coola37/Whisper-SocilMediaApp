@@ -1,5 +1,6 @@
 package com.example.anew.view
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -67,6 +68,11 @@ class RegisterActivity : AppCompatActivity() {
                 "You can log in after verifying your account with the link sent to your e-mail address.",
                 Toast.LENGTH_SHORT
             ).show()
+
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+
         } catch (e: Exception) {
             Toast.makeText(this, "The user could not be created.", Toast.LENGTH_SHORT).show()
             Log.e("performRegister", e.toString())
@@ -76,7 +82,7 @@ class RegisterActivity : AppCompatActivity() {
     private suspend fun saveDb(uId: String, username: String, email: String) {
         val usersCollection = db.collection("users")
         val userId = auth.uid.toString()
-        val detail = UserDetails("", "")
+        val detail = UserDetails(editTextUserame.text.toString(), "", 0, 0, "")
         val user = Users(uId, username, email, detail)
 
         try {

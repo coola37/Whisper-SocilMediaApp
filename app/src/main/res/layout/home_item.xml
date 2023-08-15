@@ -92,6 +92,39 @@
             app:layout_constraintStart_toStartOf="@+id/textViewName"
             app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
 
+        <ImageView
+            android:id="@+id/imageViewLike"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="@+id/imageViewPostImg"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewPostImg"
+            app:srcCompat="@drawable/ic_like" />
+
+        <TextView
+            android:id="@+id/textViewLikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:text="20"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/imageViewLike"
+            app:layout_constraintTop_toTopOf="@+id/imageViewLike" />
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Like"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@+id/textViewLikeCount"
+            app:layout_constraintTop_toTopOf="@+id/textViewLikeCount" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

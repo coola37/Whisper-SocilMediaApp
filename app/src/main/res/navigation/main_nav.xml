@@ -22,6 +22,12 @@
         <action
             android:id="@+id/action_homeFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_shareFragment"
+            app:destination="@id/shareFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_homeFollowersFragment"
+            app:destination="@id/homeFollowersFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -100,6 +106,9 @@
         <action
             android:id="@+id/action_homeFollowersFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_homeFollowersFragment_to_shareFragment"
+            app:destination="@id/shareFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -112,5 +121,29 @@
         <action
             android:id="@+id/action_profileFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.anew.view.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" >
+        <action
+            android:id="@+id/action_editProfileFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shareFragment"
+        android:name="com.example.anew.view.ShareFragment"
+        android:label="fragment_share"
+        tools:layout="@layout/fragment_share" >
+        <action
+            android:id="@+id/action_shareFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_shareFragment_to_homeFollowersFragment"
+            app:destination="@id/homeFollowersFragment" />
     </fragment>
 </navigation>

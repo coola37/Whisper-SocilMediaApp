@@ -2,10 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.ProfileFragment"
-    android:background="@color/black">
+    android:background="@color/black"
+    tools:context=".view.ProfileFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarProfile"
@@ -31,18 +32,18 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-            android:id="@+id/textViewBio"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:fontFamily="@font/archivo_narrow"
-            android:text="Lorem ipsum dolor sit amet. Ea enim quod a earum delectus ad quidem illo non minima impedit a "
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textViewUsername"
-            app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
+                android:id="@+id/textViewBio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/archivo_narrow"
+                android:text="Lorem ipsum dolor sit amet. Ea enim quod a earum delectus ad quidem illo non minima impedit a "
+                android:textColor="@color/white"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textViewUsername"
+                app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
 
             <TextView
                 android:id="@+id/textViewFollowers"
@@ -125,10 +126,10 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/archivo_narrow"
+                android:text="Yigit"
                 android:textColor="@color/white"
                 android:textSize="28sp"
                 android:textStyle="bold"
-                android:text="Yigit"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/circleImageView" />
 
@@ -138,12 +139,25 @@
                 android:layout_height="30dp"
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="16dp"
+                android:background="@drawable/bt_forget_pass_bg"
+                android:fontFamily="@font/archivo_narrow"
                 android:text="Edit profile"
                 android:textColor="@color/white"
-                android:fontFamily="@font/archivo_narrow"
-                android:background="@drawable/bt_forget_pass_bg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+            <TextView
+                android:id="@+id/textViewSignOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:text="Sign Out"
+                android:textColor="@color/purple_200"
+                android:textSize="20sp"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toStartOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
@@ -163,8 +177,8 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/home_item"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view6" />
+        app:layout_constraintTop_toBottomOf="@+id/view6"
+        tools:listitem="@layout/home_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

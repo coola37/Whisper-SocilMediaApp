@@ -6,19 +6,17 @@ import androidx.lifecycle.MutableLiveData
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
-import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val db: FirebaseFirestore,
+class ShareViewModel @Inject constructor(
+    var auth: FirebaseAuth,
+    var db: FirebaseFirestore,
     application: Application
-) : BaseViewModel(application){
-
+): BaseViewModel(application){
     val userData: MutableLiveData<Users> = MutableLiveData()
 
     suspend fun fetchUserData(userId: String){
@@ -31,8 +29,7 @@ class ProfileViewModel @Inject constructor(
                 userData.postValue(user!!)
             }
         } catch (e: Exception) {
-            Log.e("ProileViewmodelFetchData",e.message.toString())
+            Log.e("ShareViewmodelFetchData",e.message.toString())
         }
     }
-
 }
