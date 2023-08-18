@@ -87,6 +87,8 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
                 post.postID = UUID.randomUUID().toString()
                 post.date = SimpleDateFormat("dd/M/yyyy hh:mm").format(Date())
                 post.senderID = user.userId
+                post.senderUsername = user.username
+                post.senderName = user.details?.name
                 post.senderImg = user.details?.profileImg
                 post.text = binding.editTextPost.text.toString()
                 post.like = 0

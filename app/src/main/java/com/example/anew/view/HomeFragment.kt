@@ -7,18 +7,18 @@ import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
+import com.example.anew.adapter.HomePostsAdapter
 import com.example.anew.databinding.FragmentHomeBinding
-import com.example.anew.viewmodel.EditProfileViewModel
 import com.example.anew.viewmodel.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.JdkConstants.InputEventMask
 import javax.inject.Inject
 
 
@@ -34,6 +34,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     @Inject
     lateinit var glide: RequestManager
     private lateinit var viewModel: HomeViewModel
+    private lateinit var postsAdapter: HomePostsAdapter
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,6 +45,25 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         setupBottomNavigationView()
         setupButtonClick()
         fetchUserData(auth.uid!!)
+
+        postsAdapter = HomePostsAdapter(emptyList())
+
+
+
+        lifecycleScope.launch {
+            viewModel.fetchPosts()
+        }
+
+        viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
+            postsAdapter.setData(postsList)
+
+            val layoutManager = LinearLayoutManager(requireContext())
+            binding.homeRecycler.layoutManager = layoutManager
+            binding.homeRecycler.adapter = postsAdapter
+
+        }
+
+
 
     }
 
