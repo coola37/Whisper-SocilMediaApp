@@ -10,8 +10,12 @@ import com.bumptech.glide.Glide
 import com.example.anew.R
 import com.example.anew.model.Posts
 
-class HomePostsAdapter(private var dataList: List<Posts>) :
+class HomePostsAdapter(
+    private var dataList: List<Posts>,
+    private val onProfileImageClickListener: OnProfileImageClickListener
+) :
     RecyclerView.Adapter<HomePostsAdapter.ViewHolder>() {
+
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageProfil: ImageView = itemView.findViewById(R.id.imageProfil)
@@ -26,6 +30,8 @@ class HomePostsAdapter(private var dataList: List<Posts>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.home_item, parent, false)
+
+
         return ViewHolder(itemView)
     }
 
@@ -39,6 +45,13 @@ class HomePostsAdapter(private var dataList: List<Posts>) :
         holder.textViewDate.text = data.date
         holder.textViewPostText.text = data.text
         holder.textViewLikeCount.text = data.like.toString()
+
+        holder.imageProfil.setOnClickListener {
+            val senderId = data.senderID
+            if (senderId != null) {
+                onProfileImageClickListener.onProfileImageClick(senderId)
+            }
+        }
     }
 
     fun setData(newDataList: List<Posts>) {
@@ -48,4 +61,7 @@ class HomePostsAdapter(private var dataList: List<Posts>) :
     override fun getItemCount(): Int {
         return dataList.size
     }
+
+
+
 }

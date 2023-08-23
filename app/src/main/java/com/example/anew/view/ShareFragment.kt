@@ -50,6 +50,7 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
         binding = FragmentShareBinding.bind(view)
         viewModel = ViewModelProvider(this)[ShareViewModel::class.java]
 
+        fetchUserData(auth.uid!!)
         setupButtonsClick()
 
 
@@ -109,6 +110,7 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
                 post.postImg =  " "
                 lifecycleScope.launch { viewModel.savePostToDb(post) }
                 findNavController().navigate(R.id.action_shareFragment_to_homeFragment)
+
             }
         }
     }
@@ -139,9 +141,9 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
     private fun setupButtonsClick(){
         binding.imageViewClose.setOnClickListener {
             findNavController().navigate(R.id.action_shareFragment_to_homeFragment)
+            requireActivity().finish()
         }
 
-        fetchUserData(auth.uid!!)
 
         binding.imageViewGalery.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

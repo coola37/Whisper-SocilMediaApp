@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -12,6 +13,7 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
 import com.example.anew.adapter.HomePostsAdapter
+import com.example.anew.adapter.OnProfileImageClickListener
 import com.example.anew.databinding.FragmentHomeBinding
 import com.example.anew.viewmodel.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -44,26 +46,32 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         setupBottomNavigationView()
         setupButtonClick()
-        fetchUserData(auth.uid!!)
 
-        postsAdapter = HomePostsAdapter(emptyList())
+        auth.uid?.let {
 
+            fetchUserData(auth.uid!!)
+            lifecycleScope.launch {
+                viewModel.fetchPosts()
+            }
 
+            postsAdapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+                override fun onProfileImageClick(senderId: String) {
+                    val fragment = ProfileViewerFragment.newInstance(senderId)
+                    Log.e("senderidHomeFragmentToVieweFragment", senderId)
+                    findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment, bundleOf("senderId" to senderId))
 
-        lifecycleScope.launch {
-            viewModel.fetchPosts()
+                }
+            })
+
+            viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
+                postsAdapter.setData(postsList)
+
+                val layoutManager = LinearLayoutManager(requireContext())
+                binding.homeRecycler.layoutManager = layoutManager
+                binding.homeRecycler.adapter = postsAdapter
+
+            }
         }
-
-        viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
-            postsAdapter.setData(postsList)
-
-            val layoutManager = LinearLayoutManager(requireContext())
-            binding.homeRecycler.layoutManager = layoutManager
-            binding.homeRecycler.adapter = postsAdapter
-
-        }
-
-
 
     }
 
@@ -127,4 +135,5 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .into(binding.circleImage)
         }
     }
+
 }

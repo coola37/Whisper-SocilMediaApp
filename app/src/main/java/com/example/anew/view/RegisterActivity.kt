@@ -90,6 +90,11 @@ class RegisterActivity : AppCompatActivity() {
             Log.e("saveDb", "successful")
         } catch (e: Exception) {
             Log.e("saveDb", e.toString())
+            Toast.makeText(
+                this,
+                e.message.toString(),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 }

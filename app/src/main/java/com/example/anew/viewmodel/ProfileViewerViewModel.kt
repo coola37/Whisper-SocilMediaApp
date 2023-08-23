@@ -12,32 +12,15 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    val auth: FirebaseAuth,
-    val db: FirebaseFirestore,
+class ProfileViewerViewModel @Inject constructor(
+    var auth: FirebaseAuth,
+    var db : FirebaseFirestore,
     application: Application
-): BaseViewModel(application) {
+) :  BaseViewModel(application){
 
     val userData: MutableLiveData<Users> = MutableLiveData()
     val postsData: MutableLiveData<List<Posts>> = MutableLiveData()
 
-
-    suspend fun fetchPosts() {
-        val postsCollectionRef = db.collection("posts")
-        try {
-            val querySnapshot = postsCollectionRef.get().await()
-
-            val postsList = mutableListOf<Posts>()
-            for (document in querySnapshot) {
-                val post = document.toObject(Posts::class.java)
-                postsList.add(post)
-            }
-
-            (postsData as MutableLiveData<List<Posts>>).postValue(postsList)
-        } catch (e: Exception) {
-            Log.e("HomeViewModel", "Error fetching posts: ${e.message}")
-        }
-    }
     suspend fun fetchUserData(userId: String){
         val userDocRef = db.collection("users").document(userId)
         try {
@@ -51,4 +34,22 @@ class HomeViewModel @Inject constructor(
             Log.e("ProileViewmodelFetchData",e.message.toString())
         }
     }
+
+    suspend fun fetchPosts(senderIdToFilter: String) {
+        val postsCollectionRef = db.collection("posts")
+        try {
+            val querySnapshot = postsCollectionRef.whereEqualTo("senderID", senderIdToFilter).get().await()
+
+            val postsList = mutableListOf<Posts>()
+            for (document in querySnapshot) {
+                val post = document.toObject(Posts::class.java)
+                postsList.add(post)
+            }
+
+            (postsData as MutableLiveData<List<Posts>>).postValue(postsList)
+        } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error fetching posts: ${e.message}")
+        }
+    }
+
 }

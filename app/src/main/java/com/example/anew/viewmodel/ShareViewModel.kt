@@ -38,8 +38,7 @@ class ShareViewModel @Inject constructor(
 
     suspend fun savePostToDb(post: Posts){
         try {
-            db.collection("posts").document(auth.uid ?: "").collection("posts")
-                .document(post.postID ?: "").set(post).await()
+            db.collection("posts").document(post.postID ?: "").set(post).await()
         } catch (e: Exception) {
             Log.e("SavePostDb", e.message.toString())
         }

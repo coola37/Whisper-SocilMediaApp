@@ -39,8 +39,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.textViewSignOut.setOnClickListener {
             auth.signOut()
         }
-        fetchUserData(auth.uid.toString())
-        binding.buttonProfileEdit.setOnClickListener {
+        fetchUserData(auth.uid!!)
+        binding.buttonEditProfile.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
         }
 

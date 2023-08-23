@@ -62,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
                         saveFcnToken()
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
-                        finish()
+                        this.finish()
                     } else {
                         showToast("Please verify your Email!")
                     }
