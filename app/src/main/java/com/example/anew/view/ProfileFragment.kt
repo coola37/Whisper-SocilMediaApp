@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +12,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
+import com.example.anew.adapter.HomePostsAdapter
+import com.example.anew.adapter.OnProfileImageClickListener
 import com.example.anew.databinding.FragmentProfileBinding
 import com.example.anew.viewmodel.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -30,30 +34,42 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     @Inject
     lateinit var auth: FirebaseAuth
     private lateinit var profileViewModel: ProfileViewModel
+    private lateinit var adapter: HomePostsAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentProfileBinding.bind(view)
         profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
-
-        binding.textViewSignOut.setOnClickListener {
-            auth.signOut()
-        }
+        setupButtons()
+        profileViewModel.fetchPosts()
         fetchUserData(auth.uid!!)
-        binding.buttonEditProfile.setOnClickListener {
-            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+
+        adapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+            override fun onProfileImageClick(senderId: String) {
+
+            }
+        })
+
+        profileViewModel.postsData.observe(viewLifecycleOwner){
+            adapter.setData(it)
+
+            val layoutManager = LinearLayoutManager(requireContext())
+            binding.profileRecycler.layoutManager = layoutManager
+            binding.profileRecycler.adapter = adapter
         }
 
     }
 
+
+
     private fun fetchUserData(userId: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
+
+        try {
                 profileViewModel.fetchUserData(userId)
-            } catch (e: Exception) {
-                // Hata durumunu işle
-            }
+        } catch (e: Exception) {
+                Log.e("profileFragmentFetchUser", e.message.toString())
         }
+
 
         profileViewModel.userData.observe(viewLifecycleOwner) { user ->
 
@@ -71,4 +87,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 .into(binding.circleImageView)
             }
     }
+
+    private fun setupButtons(){
+        binding.textViewSignOut.setOnClickListener {
+            auth.signOut()
+        }
+        binding.buttonEditProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+    }
+
+
 }

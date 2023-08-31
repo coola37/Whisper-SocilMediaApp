@@ -46,29 +46,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/textViewUsername" />
 
             <TextView
-                android:id="@+id/textViewFollowers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:fontFamily="@font/archivo_narrow"
-                android:text="20"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="@+id/textViewUsername"
-                app:layout_constraintTop_toBottomOf="@+id/textViewBio" />
-
-            <TextView
                 android:id="@+id/textViewFollowed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/archivo_narrow"
                 android:text="20"
                 android:textColor="@color/white"
                 android:textSize="24sp"
-                app:layout_constraintStart_toEndOf="@+id/textView15"
+                app:layout_constraintStart_toStartOf="@+id/textViewBio"
                 app:layout_constraintTop_toBottomOf="@+id/textViewBio" />
 
             <TextView
@@ -81,7 +67,7 @@
                 android:text="Followed"
                 android:textColor="@color/fontgrey"
                 android:textSize="24sp"
-                app:layout_constraintStart_toEndOf="@+id/textViewFollowers"
+                app:layout_constraintStart_toEndOf="@+id/textViewFollowed"
                 app:layout_constraintTop_toBottomOf="@+id/textViewBio" />
 
             <TextView
@@ -94,7 +80,7 @@
                 android:text="Followers"
                 android:textColor="@color/fontgrey"
                 android:textSize="24sp"
-                app:layout_constraintStart_toEndOf="@+id/textViewFollowed"
+                app:layout_constraintStart_toEndOf="@+id/textViewFollowers"
                 app:layout_constraintTop_toBottomOf="@+id/textViewBio" />
 
             <TextView
@@ -158,6 +144,18 @@
                 android:textStyle="italic"
                 app:layout_constraintEnd_toStartOf="@+id/imageView"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewFollowers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/archivo_narrow"
+                android:text="20"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                app:layout_constraintStart_toEndOf="@+id/textView15"
+                app:layout_constraintTop_toTopOf="@+id/textView16" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>

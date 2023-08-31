@@ -70,14 +70,14 @@
             android:id="@+id/textViewDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:text="21 h"
-            android:textColor="@color/white"
+            android:textColor="@color/fontgrey"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view4" />
+            app:layout_constraintTop_toBottomOf="@+id/imageViewPostImg" />
 
         <TextView
             android:id="@+id/textViewPostText"
@@ -94,10 +94,11 @@
 
         <ImageView
             android:id="@+id/imageViewLike"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="@+id/imageViewPostImg"
+            app:layout_constraintStart_toEndOf="@+id/imageViewComment"
             app:layout_constraintTop_toBottomOf="@+id/imageViewPostImg"
             app:srcCompat="@drawable/ic_like" />
 
@@ -105,8 +106,8 @@
             android:id="@+id/textViewLikeCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="-2dp"
             android:text="20"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -114,16 +115,14 @@
             app:layout_constraintStart_toEndOf="@+id/imageViewLike"
             app:layout_constraintTop_toTopOf="@+id/imageViewLike" />
 
-        <TextView
-            android:id="@+id/textView11"
+        <ImageView
+            android:id="@+id/imageViewComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="Like"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintStart_toEndOf="@+id/textViewLikeCount"
-            app:layout_constraintTop_toTopOf="@+id/textViewLikeCount" />
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="@+id/imageViewPostImg"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewPostImg"
+            app:srcCompat="@drawable/ic_like_comment" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

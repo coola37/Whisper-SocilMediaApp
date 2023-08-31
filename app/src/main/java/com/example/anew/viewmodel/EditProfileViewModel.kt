@@ -14,6 +14,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -23,12 +24,12 @@ import javax.inject.Inject
 class EditProfileViewModel @Inject constructor(
     val auth: FirebaseAuth,
     val db: FirebaseFirestore,
-    val storage: FirebaseStorage,
+    private val storage: FirebaseStorage,
     application: Application
 ) : BaseViewModel(application)  {
     val userData: MutableLiveData<Users> = MutableLiveData()
 
-    suspend fun uploadProfileImageAndGetUrl(userID: String, imgUri: Uri): String {
+     suspend fun uploadProfileImageAndGetUrl(userID: String, imgUri: Uri): String {
         return withContext(Dispatchers.IO) {
             return@withContext suspendCancellableCoroutine<String> { continuation ->
                 val storageRef = storage.reference.child("profile_images").child("$userID.jpg")
@@ -51,40 +52,45 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateProfileData(userId: String, name: String, bio: String, profileImageUrl: String) {
-        val userDocRef = db.collection("users").document(userId)
+     fun updateProfileData(userId: String, name: String, bio: String, profileImageUrl: String) {
+        launch {
+            val userDocRef = db.collection("users").document(userId)
 
-        val updateData = hashMapOf<String, Any>(
-            "details.name" to name,
-            "details.bio" to bio,
-            "details.profileImg" to profileImageUrl
-        )
+            val updateData = hashMapOf<String, Any>(
+                "details.name" to name,
+                "details.bio" to bio,
+                "details.profileImg" to profileImageUrl
+            )
 
-        try {
-            userDocRef.update(updateData as Map<String, Any>).await()
-        } catch (e: Exception) {
-            Log.e("EditProfileViewModel", "Error uploading and setting profile image: ${e.message}", e)
-        }
-    }
-
-    suspend fun uploadAndSetProfileImage(userId: String, imgUri: Uri, name: String, bio: String) {
-        val imageUrl = uploadProfileImageAndGetUrl(userId, imgUri)
-        // Assume you have user details like name and bio in variables
-        updateProfileData(userId, name, bio, imageUrl)
-    }
-
-    suspend fun fetchUserData(userId: String){
-        val userDocRef = db.collection("users").document(userId)
-        try {
-            val snapshot = userDocRef.get().await()
-
-            snapshot?.let { documentSnapshot ->
-                val user = documentSnapshot.toObject(Users::class.java)
-                userData.postValue(user!!)
+            try {
+                userDocRef.update(updateData as Map<String, Any>).await()
+            } catch (e: Exception) {
+                Log.e("EditProfileViewModel", "Error uploading and setting profile image: ${e.message}", e)
             }
-        } catch (e: Exception) {
-            Log.e("ProileViewmodelFetchData",e.message.toString())
         }
+    }
+
+     fun uploadAndSetProfileImage(userId: String, imgUri: Uri, name: String, bio: String) {
+        launch {
+            val imageUrl = uploadProfileImageAndGetUrl(userId, imgUri)
+            updateProfileData(userId, name, bio, imageUrl)
+        }
+    }
+
+     fun fetchUserData(userId: String){
+       launch {
+           val userDocRef = db.collection("users").document(userId)
+           try {
+               val snapshot = userDocRef.get().await()
+
+               snapshot?.let { documentSnapshot ->
+                   val user = documentSnapshot.toObject(Users::class.java)
+                   userData.postValue(user!!)
+               }
+           } catch (e: Exception) {
+               Log.e("ProileViewmodelFetchData",e.message.toString())
+           }
+       }
     }
 }
 

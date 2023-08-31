@@ -38,6 +38,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private lateinit var imgURİ: Uri
     @Inject
     lateinit var glide: RequestManager
+    private var profileUrl: String = ""
 
 
 
@@ -45,8 +46,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEditProfileBinding.bind(view)
         viewModel = ViewModelProvider(this)[EditProfileViewModel::class.java]
+        imgURİ = Uri.EMPTY
+
+        getUserData(auth.uid!!)
         setupButton()
-        fetchUserData(auth.uid!!)
+
+
     }
 
     private fun setupButton(){
@@ -58,12 +63,16 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             val bio = binding.editTextTextBio.text.toString()
             val selectedImageUri = imgURİ
 
-            if (selectedImageUri != null) {
+            if (selectedImageUri != Uri.EMPTY) {
                 lifecycleScope.launch {
                     val imageUrl = viewModel.uploadProfileImageAndGetUrl(auth.currentUser!!.uid, selectedImageUri)
                     viewModel.updateProfileData(auth.currentUser!!.uid, name, bio, imageUrl)
+                    Log.e("imageUrl", imageUrl)
                     findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
                 }
+            }else{
+                viewModel.updateProfileData(auth.currentUser!!.uid, name, bio, profileUrl)
+                findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
             }
         }
         binding.imageViewBack.setOnClickListener {
@@ -74,6 +83,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,26 +99,20 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         }
     }
 
-    private fun fetchUserData(userId: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                viewModel.fetchUserData(userId)
-            } catch (e: Exception) {
-                Log.e("EditProFragFetchData", e.message.toString())
-            }
-        }
+    private fun getUserData(userId :String){
+        viewModel.fetchUserData(userId)
 
-        viewModel.userData.observe(viewLifecycleOwner) { user ->
+        viewModel.userData.observe(viewLifecycleOwner){
+            binding.editTextTextBio.hint = it.details?.bio
+            binding.editTextTextName.hint = it.details?.name
 
-            binding.editTextTextBio.hint = user.details?.bio
-            binding.editTextTextName.hint = user.details?.name
-
-            glide.load(user.details?.profileImg)
-                .placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_none_img)
+            glide.load(it.details?.profileImg)
+                .placeholder(R.mipmap.ic_none_img)
+                .error(R.mipmap.ic_launcher)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .into(binding.profileImg)
         }
     }
+
 }
