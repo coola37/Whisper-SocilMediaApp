@@ -7,8 +7,10 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -70,6 +72,9 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
             viewModel.fetchPosts(senderId)
         }
 
+        binding.imageViewSendMsg.setOnClickListener {
+            findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment, bundleOf("senderId" to senderId))
+        }
 
         CoroutineScope(Dispatchers.Main).async{
 

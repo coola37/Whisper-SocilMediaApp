@@ -105,6 +105,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         viewModel.userData.observe(viewLifecycleOwner){
             binding.editTextTextBio.hint = it.details?.bio
             binding.editTextTextName.hint = it.details?.name
+            profileUrl = it.details?.profileImg!!
 
             glide.load(it.details?.profileImg)
                 .placeholder(R.mipmap.ic_none_img)

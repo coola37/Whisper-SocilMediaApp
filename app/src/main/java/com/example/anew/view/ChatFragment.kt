@@ -1,60 +1,93 @@
 package com.example.anew.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
+import com.example.anew.databinding.FragmentChatBinding
+import com.example.anew.model.Messages
+import com.example.anew.viewmodel.ChatViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.UUID
+import javax.inject.Inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@AndroidEntryPoint
+class ChatFragment : Fragment(R.layout.fragment_chat) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ChatFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ChatFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    companion object {
+        fun newInstance(senderId: String) : ChatFragment {
+            val fragment = ChatFragment()
+            val args = Bundle()
+            args.putString("senderId", senderId)
+            fragment.arguments = args
+            return fragment
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false)
+    private lateinit var binding: FragmentChatBinding
+    private lateinit var viewModel: ChatViewModel
+    @Inject
+    internal lateinit var auth: FirebaseAuth
+    @Inject
+    internal lateinit var db: FirebaseFirestore
+    @Inject
+    internal lateinit var glide: RequestManager
+    private lateinit var receiverId : String
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentChatBinding.bind(view)
+        viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+        receiverId = requireArguments().getString("senderId").toString()
+
+        CoroutineScope(Dispatchers.IO).async {
+            auth.currentUser?.let {
+                viewModel.fetchSenderUser(auth.uid!!)
+                viewModel.fetchReceiverUser(receiverId)
+            }
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            getReceiverUserData()
+        }
+
+        binding.buttonSendMsg.setOnClickListener {
+            binding.editTextTextMsg.text.clear()
+            sendMessage()
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChatFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ChatFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun sendMessage(){
+        val msgText = binding.editTextTextMsg.text.toString()
+        val date = SimpleDateFormat("dd/M/yyyy hh:mm").format(Date())
+        val msgId = UUID.randomUUID().toString()
+        val msg = Messages(msgId, auth.uid, receiverId, msgText, date)
+        CoroutineScope(Dispatchers.Main).launch { viewModel.saveMsgToDb(msg) }
+    }
+    private fun getReceiverUserData(){
+        viewModel.receiverUser.observe(viewLifecycleOwner){
+
+            binding.receiverUsername.text = it.username
+            binding.receiverName.text = it.details?.name
+            glide.load(it.details?.profileImg)
+                .placeholder(R.mipmap.ic_none_img)
+                .error(R.mipmap.ic_launcher)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .into(binding.receiverProfileImg)
+
+        }
     }
 }

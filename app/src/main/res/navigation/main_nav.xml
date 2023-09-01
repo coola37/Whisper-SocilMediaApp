@@ -172,5 +172,8 @@
         <argument
             android:name="senderId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_profileViewerFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
 </navigation>

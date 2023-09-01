@@ -36,21 +36,4 @@ class InboxViewModel @Inject constructor(
             }
         }
 
-    suspend fun saveMsgToDb(msg: Messages){
-        val senderChannel = msg.recevierId + msg.senderId
-        val receiverChannel = msg.senderId + msg.recevierId
-
-        try {
-            db.collection("messages").document(senderChannel ?: "")
-                .collection("chats").document(msg.messageId ?: "").set(msg).await()
-            db.collection("messages").document(receiverChannel ?: "").
-                    collection("chats").document(msg.messageId ?: "").set(msg).await()
-
-
-        }catch (e: java.lang.Exception){
-            Log.e("Msg save to db error", e.message.toString())
-        }
-    }
-
-
 }
