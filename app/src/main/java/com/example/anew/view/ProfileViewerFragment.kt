@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
@@ -54,8 +56,6 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
     private lateinit var viewModel: ProfileViewerViewModel
     private lateinit var binding : FragmentProfileViewerBinding
     private lateinit var adapter: HomePostsAdapter
-    private var currentUserModel = Users()
-    private var followedUser = Users()
     private lateinit var senderId : String
 
 
@@ -67,47 +67,72 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
 
         senderId = requireArguments().getString("senderId").toString()
 
-        CoroutineScope(Dispatchers.IO).async {
+        CoroutineScope(Dispatchers.IO).launch {
             viewModel.fetchUserData(senderId)
             viewModel.fetchPosts(senderId)
+            viewModel.checkFollowButton(senderId)
+
         }
 
         binding.imageViewSendMsg.setOnClickListener {
             findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment, bundleOf("senderId" to senderId))
         }
 
-        CoroutineScope(Dispatchers.Main).async{
-
+        CoroutineScope(Dispatchers.Main).launch{
             getUserData()
             getPostData()
-            checkIfFollowing(senderId)
+            viewModel.buttonCheck.observe(viewLifecycleOwner){
+                checkFollowingForButton(it)
+            }
+
         }
 
-        /*  senderId?.let {
-
-            Log.e("senderId", it)
-        } ?: Log.e("senderId", "Sender ID is null.")
-*/
 
         adapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
             override fun onProfileImageClick(senderId: String) {
 
             }
         })
+
         binding.buttonFollow.setOnClickListener {
-           viewLifecycleOwner.lifecycleScope.launch {
-               viewModel.checkIfFollowing(senderId){
-                   if(it){
-                       getUserData()
-                       viewLifecycleOwner.lifecycleScope.launch { unfollowUser(senderId) }
-                   }
-                   else{
-                       getUserData()
-                       viewLifecycleOwner.lifecycleScope.launch { followUser(senderId) }
-                   }
-               }
-           }
+            viewModel.checkIfFollowing(senderId)
+            viewModel.checkFollowing.observe(viewLifecycleOwner){
+                if (it){
+                    followButton()
+                    unfollowUser()
+                    viewModel.checkUserUpdate.observe(viewLifecycleOwner){
+                        if(it){
+                            CoroutineScope(Dispatchers.Main).launch {
+                                viewModel.refreshUserData(senderId)
+                                viewModel.userData.observe(viewLifecycleOwner) { user ->
+                                    binding.textViewFollowed.text = user.details?.followed.toString()
+                                    binding.textViewFollowers.text = user.details?.followers.toString()
+                                }
+                            }
+                        }else{
+                            Log.d("checkUserUpdate", "false")
+                        }
+                    }
+                }else{
+                    followUser()
+                    unfollowButton()
+                    viewModel.checkUserUpdate.observe(viewLifecycleOwner){
+                        if(it){
+                            CoroutineScope(Dispatchers.Main).launch {
+                                viewModel.refreshUserData(senderId)
+                                viewModel.userData.observe(viewLifecycleOwner) { user ->
+                                    binding.textViewFollowed.text = user.details?.followed.toString()
+                                    binding.textViewFollowers.text = user.details?.followers.toString()
+                                }
+                            }
+                        }else{
+                            Log.d("checkUserUpdate", "false")
+                        }
+                    }
+                }
+            }
         }
+
 
     }
 
@@ -124,26 +149,29 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
     }
 
 
-    private  fun checkIfFollowing(senderId: String){
-        viewModel.checkIfFollowing(senderId!!){
-            if(it){
-                binding.buttonFollow.setBackgroundResource(R.drawable.active_bt_bg)
-                binding.buttonFollow.text = "Unfollow"
-                binding.buttonFollow.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+    private  fun checkFollowingForButton(follow: Boolean){
+            if(follow){
+                unfollowButton()
             }
             else{
-                binding.buttonFollow.setBackgroundResource(R.drawable.bt_login_bg)
-                binding.buttonFollow.text = "Follow"
-                binding.buttonFollow.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                followButton()
             }
-        }
     }
 
+    private fun unfollowButton(){
+        binding.buttonFollow.setBackgroundResource(R.drawable.active_bt_bg)
+        binding.buttonFollow.text = "Unfollow"
+        binding.buttonFollow.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+    }
+    private fun followButton(){
+        binding.buttonFollow.setBackgroundResource(R.drawable.bt_login_bg)
+        binding.buttonFollow.text = "Follow"
+        binding.buttonFollow.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+    }
 
     private  fun getUserData() {
-        CoroutineScope(Dispatchers.Main).async {
+        CoroutineScope(Dispatchers.Main).launch {
             viewModel.userData.observe(viewLifecycleOwner) { user ->
-                followedUser = user
                 binding.textViewUsername.text = user?.username
                 binding.textViewName.text = user.details?.name
                 binding.textViewBio.text = user.details?.bio
@@ -161,44 +189,27 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
     }
 
 
-    private  fun followUser(userIdToFollow: String) {
-        viewLifecycleOwner.lifecycleScope.launch{
+    private fun followUser() {
+        viewLifecycleOwner.lifecycleScope.launch {
             val currentUser = auth.currentUser
             currentUser?.let { user ->
                 val currentUserUid = user.uid
-
                 val usersCollection = db.collection("users")
-
-                val followedUserRef = usersCollection.document(userIdToFollow)
+                val followedUserRef = usersCollection.document(senderId)
                 val currentUserRef = usersCollection.document(currentUserUid)
 
-
-
-                usersCollection.document(currentUserUid)
-                    .get()
-                    .addOnSuccessListener { documentSnapshot ->
-                        if (documentSnapshot.exists()) {
-                            val user = documentSnapshot.toObject(Users::class.java)
-                            currentUserModel = user!!
-                        } else {
-                            // Belirtilen kullanıcıya ait veri bulunamadı
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("FetchUserData", "Hata: ${e.message}", e)
-                    }
-
                 followedUserRef.update(
-                    "details.listFollowers", FieldValue.arrayUnion(currentUserModel.userId),
+                    "details.listFollowers", FieldValue.arrayUnion(auth.uid),
                     "details.followers", FieldValue.increment(1)
                 ).addOnSuccessListener {
                     Log.d("FollowUser", "User followed")
 
                     currentUserRef.update(
-                        "details.listFollow", FieldValue.arrayUnion(followedUser.userId),
+                        "details.listFollow", FieldValue.arrayUnion(senderId),
                         "details.followed", FieldValue.increment(1)
                     ).addOnSuccessListener {
                         Log.d("FollowUser", "User follower added")
+                        viewModel.checkUserUpdate.postValue(true)
                     }.addOnFailureListener { e ->
                         Log.e("FollowUser", e.message.toString())
                     }
@@ -208,41 +219,28 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
             }
         }
     }
-    private  fun unfollowUser(userIdToUnfollow: String) {
+
+    private fun unfollowUser() {
         viewLifecycleOwner.lifecycleScope.launch {
             val currentUser = auth.currentUser
             currentUser?.let { user ->
                 val currentUserUid = user.uid
-
                 val usersCollection = db.collection("users")
-
-                val followedUserRef = usersCollection.document(userIdToUnfollow)
+                val followedUserRef = usersCollection.document(senderId)
                 val currentUserRef = usersCollection.document(currentUserUid)
 
-                usersCollection.document(currentUserUid)
-                    .get()
-                    .addOnSuccessListener { documentSnapshot ->
-                        if (documentSnapshot.exists()) {
-                            val user = documentSnapshot.toObject(Users::class.java)
-                            currentUserModel = user!!
-                        } else {
-                            // Belirtilen kullanıcıya ait veri bulunamadı
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("FetchUserData", "Hata: ${e.message}", e)
-                    }
                 followedUserRef.update(
-                    "details.listFollowers", FieldValue.arrayRemove(currentUserModel.userId),
+                    "details.listFollowers", FieldValue.arrayRemove(auth.uid),
                     "details.followers", FieldValue.increment(-1)
                 ).addOnSuccessListener {
                     Log.d("UnfollowUser", "User unfollowed")
 
                     currentUserRef.update(
-                        "details.listFollow", FieldValue.arrayRemove(userIdToUnfollow),
+                        "details.listFollow", FieldValue.arrayRemove(senderId),
                         "details.followed", FieldValue.increment(-1)
                     ).addOnSuccessListener {
                         Log.d("UnfollowUser", "User unfollower removed")
+                        viewModel.checkUserUpdate.postValue(true)
                     }.addOnFailureListener { e ->
                         Log.e("UnfollowUser", e.message.toString())
                     }

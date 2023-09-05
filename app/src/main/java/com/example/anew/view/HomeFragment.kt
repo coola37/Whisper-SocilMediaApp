@@ -57,7 +57,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     if(senderId == auth.uid){
                         findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
                     }else{
-                        findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment, bundleOf("senderId" to senderId))
+                        findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
+                            bundleOf("senderId" to senderId))
                     }
 
                 }

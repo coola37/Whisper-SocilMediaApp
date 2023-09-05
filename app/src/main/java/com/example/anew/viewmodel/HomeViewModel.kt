@@ -44,7 +44,17 @@ class HomeViewModel @Inject constructor(
     }
      fun fetchUserData(userId: String){
         launch {
+            val userDocRef = db.collection("users").document(userId)
+            try {
+                val snapshot = userDocRef.get().await()
 
+                snapshot?.let { documentSnapshot ->
+                    val user = documentSnapshot.toObject(Users::class.java)
+                    userData.postValue(user!!)
+                }
+            } catch (e: Exception) {
+                Log.e("ProileViewmodelFetchData",e.message.toString())
+            }
         }
     }
 }

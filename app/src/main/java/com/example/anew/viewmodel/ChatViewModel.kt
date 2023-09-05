@@ -7,6 +7,7 @@ import com.example.anew.model.Messages
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -20,6 +21,7 @@ class ChatViewModel @Inject constructor(
 
     val senderUser: MutableLiveData<Users> = MutableLiveData()
     val receiverUser: MutableLiveData<Users> = MutableLiveData()
+    val msgData: MutableLiveData<List<Messages>> = MutableLiveData()
 
     suspend fun fetchSenderUser(userId: String){
         val userDocRef = db.collection("users").document(userId)
@@ -47,6 +49,24 @@ class ChatViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("ChatViewmodelReceiverFetchData",e.message.toString())
         }
+    }
+
+    suspend fun fetchMessages(senderId: String, receiverId: String){
+        val senderChannel = receiverId + senderId
+        val receiverChannel = senderId + receiverId
+        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats")
+        try {
+            val querySnapshot = msgCollectionRef.get().await()
+            val msgList = mutableListOf<Messages>()
+            for(document in querySnapshot){
+                val msg = document.toObject(Messages::class.java)
+                msgList.add(msg)
+            }
+            (msgData as MutableLiveData<List<Messages>>).postValue(msgList)
+        }catch (e: java.lang.Exception){
+            Log.e("fetchMessages", e.message.toString())
+        }
+
     }
 
 

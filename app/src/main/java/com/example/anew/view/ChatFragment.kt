@@ -7,9 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
+import com.example.anew.adapter.ChatAdapter
 import com.example.anew.databinding.FragmentChatBinding
 import com.example.anew.model.Messages
 import com.example.anew.viewmodel.ChatViewModel
@@ -47,33 +50,53 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     @Inject
     internal lateinit var glide: RequestManager
     private lateinit var receiverId : String
+    private var senderUsername: String = ""
+    private lateinit var adapter : ChatAdapter
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChatBinding.bind(view)
         viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
         receiverId = requireArguments().getString("senderId").toString()
+        adapter = ChatAdapter(requireContext(), emptyList())
 
         CoroutineScope(Dispatchers.IO).async {
             auth.currentUser?.let {
                 viewModel.fetchSenderUser(auth.uid!!)
                 viewModel.fetchReceiverUser(receiverId)
+                viewModel.fetchMessages(auth.uid.toString(), receiverId)
             }
         }
         CoroutineScope(Dispatchers.Main).launch {
             getReceiverUserData()
+            getSenderUserData()
+
+            viewModel.msgData.observe(viewLifecycleOwner){
+                adapter.setData(it)
+
+                val layoutManager = LinearLayoutManager(requireContext())
+                binding.chatRecycler.layoutManager = layoutManager
+                binding.chatRecycler.adapter = adapter
+            }
+
         }
 
         binding.buttonSendMsg.setOnClickListener {
-            binding.editTextTextMsg.text.clear()
-            sendMessage()
+           CoroutineScope(Dispatchers.Main).launch {
+               sendMessage()
+               binding.editTextTextMsg.text.clear()
+           }
         }
+
+
     }
 
     private fun sendMessage(){
         val msgText = binding.editTextTextMsg.text.toString()
         val date = SimpleDateFormat("dd/M/yyyy hh:mm").format(Date())
         val msgId = UUID.randomUUID().toString()
-        val msg = Messages(msgId, auth.uid, receiverId, msgText, date)
+
+        val msg = Messages(msgId, auth.uid, receiverId, msgText, date, senderUsername)
+
         CoroutineScope(Dispatchers.Main).launch { viewModel.saveMsgToDb(msg) }
     }
     private fun getReceiverUserData(){
@@ -90,4 +113,12 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
         }
     }
+
+    private fun getSenderUserData(){
+        viewModel.senderUser.observe(viewLifecycleOwner){
+            senderUsername = it.username!!
+        }
+    }
+
+
 }
