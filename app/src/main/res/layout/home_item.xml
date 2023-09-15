@@ -96,9 +96,8 @@
             android:id="@+id/imageViewLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintStart_toEndOf="@+id/imageViewComment"
+            app:layout_constraintStart_toStartOf="@+id/imageViewPostImg"
             app:layout_constraintTop_toBottomOf="@+id/imageViewPostImg"
             app:srcCompat="@drawable/ic_like" />
 
@@ -114,15 +113,6 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/imageViewLike"
             app:layout_constraintTop_toTopOf="@+id/imageViewLike" />
-
-        <ImageView
-            android:id="@+id/imageViewComment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="@+id/imageViewPostImg"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewPostImg"
-            app:srcCompat="@drawable/ic_like_comment" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

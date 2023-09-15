@@ -3,6 +3,7 @@ package com.example.anew.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.anew.model.Comments
 import com.example.anew.model.Posts
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,7 @@ import javax.inject.Inject
     val checkFollowing: MutableLiveData<Boolean> = MutableLiveData()
     val checkUserUpdate: MutableLiveData<Boolean> = MutableLiveData()
     val buttonCheck: MutableLiveData<Boolean> = MutableLiveData()
+
 
 
 

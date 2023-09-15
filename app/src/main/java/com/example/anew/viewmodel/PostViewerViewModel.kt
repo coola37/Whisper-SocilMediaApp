@@ -3,6 +3,7 @@ package com.example.anew.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.anew.model.Comments
 import com.example.anew.model.Posts
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +25,7 @@ class PostViewerViewModel @Inject constructor(
     val postsData: MutableLiveData<Posts> = MutableLiveData()
     val checkUpdate: MutableLiveData<Boolean> = MutableLiveData()
     val checkLike: MutableLiveData<Boolean> = MutableLiveData()
+    val commentsData: MutableLiveData<Comments> = MutableLiveData()
 
     suspend fun refreshPostData(postId: String){
         val postsCollectionRef = db.collection("posts").document(postId)
@@ -112,6 +114,18 @@ class PostViewerViewModel @Inject constructor(
             }
 
         }
+    }
+
+    suspend fun saveCommentToDb(comments: Comments){
+        try {
+            db.collection("comments").document(comments.commentsID ?: "").set(comments).await()
+        } catch (e: java.lang.Exception) {
+            Log.e("SaveCommentsDb", e.message.toString())
+        }
+    }
+
+    suspend fun fetchCommentsData(){
+
     }
 
 }

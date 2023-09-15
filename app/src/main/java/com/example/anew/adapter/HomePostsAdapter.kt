@@ -29,7 +29,7 @@ class HomePostsAdapter(
         val textViewPostText: TextView = itemView.findViewById(R.id.textViewPostText)
         val textViewLikeCount: TextView = itemView.findViewById(R.id.textViewLikeCount)
         val imageViewLike: ImageView = itemView.findViewById(R.id.imageViewLike)
-        val imageViewComments: ImageView = itemView.findViewById(R.id.imageViewComment)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
