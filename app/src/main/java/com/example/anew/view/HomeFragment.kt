@@ -18,6 +18,9 @@ import com.example.anew.viewmodel.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -45,32 +48,63 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         auth.uid?.let {
 
-            fetchUserData(auth.uid!!)
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.fetchUserData(it)
+                viewModel.fetchPosts()
+            }
 
-            viewModel.fetchPosts()
+            CoroutineScope(Dispatchers.Main).launch{
+                fetchUserData()
+                postsAdapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+                    override fun onProfileImageClick(senderId: String) {
+                        val fragment = ProfileViewerFragment.newInstance(senderId)
+                        if(senderId == auth.uid){
+                            findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+                        }else{
+                            findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
+                                bundleOf("senderId" to senderId))
+                        }
 
-
-            postsAdapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
-                override fun onProfileImageClick(senderId: String) {
-                    val fragment = ProfileViewerFragment.newInstance(senderId)
-                    Log.e("senderidHomeFragmentToVieweFragment", senderId)
-                    if(senderId == auth.uid){
-                        findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
-                    }else{
-                        findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
-                            bundleOf("senderId" to senderId))
+                    }
+                }, object : OnProfileImageClickListener{
+                    override fun onProfileImageClick(senderId: String) {
+                        CoroutineScope(Dispatchers.IO).launch { viewModel.checkLike(senderId) }
+                        viewModel.checkLike.observe(viewLifecycleOwner){
+                            if(it){
+                                viewModel.disLike(senderId)
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    viewModel.refreshPostData()
+                                    viewModel.postsData.observe(viewLifecycleOwner){
+                                        postsAdapter.setData(it)
+                                    }
+                                }
+                            }else{
+                                viewModel.like(senderId)
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    viewModel.refreshPostData()
+                                    viewModel.postsData.observe(viewLifecycleOwner){
+                                        postsAdapter.setData(it)
+                                    }
+                                }
+                            }
+                        }
                     }
 
+                }, object : OnProfileImageClickListener{
+                    override fun onProfileImageClick(senderId: String) {
+                        findNavController().navigate(R.id.action_homeFragment_to_postViewerFragment,
+                            bundleOf("postID" to senderId))
+                    }
+                })
+
+                viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
+                    postsAdapter.setData(postsList)
+
+                    val layoutManager = LinearLayoutManager(requireContext())
+                    binding.homeRecycler.layoutManager = layoutManager
+                    binding.homeRecycler.adapter = postsAdapter
+
                 }
-            })
-
-            viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
-                postsAdapter.setData(postsList)
-
-                val layoutManager = LinearLayoutManager(requireContext())
-                binding.homeRecycler.layoutManager = layoutManager
-                binding.homeRecycler.adapter = postsAdapter
-
             }
         }
 
@@ -115,14 +149,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             findNavController().navigate(R.id.action_homeFragment_to_homeFollowersFragment)
         }
     }
-    private fun fetchUserData(userId: String) {
-
-        try {
-            viewModel.fetchUserData(userId)
-        } catch (e: Exception) {
-            Log.e("homeFragmentFetchUserdata", e.message.toString())
-        }
-
+    private fun fetchUserData() {
 
         viewModel.userData.observe(viewLifecycleOwner) { user ->
             glide.load(user.details?.profileImg)

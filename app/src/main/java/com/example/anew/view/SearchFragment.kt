@@ -22,6 +22,8 @@ import com.example.anew.viewmodel.SearchViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Objects
 import javax.inject.Inject
@@ -44,30 +46,36 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
         viewModel = ViewModelProvider(this)[SearchViewModel::class.java]
-        viewModel.fetchUsers()
-        viewModel.fetchUserData(auth.uid!!)
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-            androidx.appcompat.widget.SearchView.OnQueryTextListener{
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
-            }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.search(newText ?: "")
-                return true
-            }
+        CoroutineScope(Dispatchers.IO).launch{
+            viewModel.fetchUsers()
+            viewModel.fetchUserData(auth.uid!!)
+        }
 
-        })
-        setupBottomNavigationView()
-        adapter = UsersAdapter(emptyList(), object : OnProfileImageClickListener{
-            override fun onProfileImageClick(senderId: String) {
-                val fragment = ProfileViewerFragment.newInstance(senderId)
-                Log.e("senderId SearchFragmentToViewerFragment", senderId)
-                findNavController().navigate(R.id.action_searchFragment_to_profileViewerFragment, bundleOf("senderId" to senderId))
-            }
+        CoroutineScope(Dispatchers.Main).launch {
+            binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+                androidx.appcompat.widget.SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
 
-        })
-        getUsersData()
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    viewModel.search(newText ?: "")
+                    return true
+                }
+
+            })
+            setupBottomNavigationView()
+            adapter = UsersAdapter(emptyList(), object : OnProfileImageClickListener{
+                override fun onProfileImageClick(senderId: String) {
+                    val fragment = ProfileViewerFragment.newInstance(senderId)
+                    Log.e("senderId SearchFragmentToViewerFragment", senderId)
+                    findNavController().navigate(R.id.action_searchFragment_to_profileViewerFragment, bundleOf("senderId" to senderId))
+                }
+
+            })
+            getUsersData()
+        }
 
 
     }

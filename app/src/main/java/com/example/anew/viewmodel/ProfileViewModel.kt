@@ -23,41 +23,53 @@ class ProfileViewModel @Inject constructor(
 
     val userData: MutableLiveData<Users> = MutableLiveData()
     val postsData: MutableLiveData<List<Posts>> = MutableLiveData()
+    val checkUserProfileUpdate: MutableLiveData<Boolean> = MutableLiveData()
+    val checkUpdateUserData: MutableLiveData<Boolean> = MutableLiveData()
 
-     fun fetchUserData(userId: String){
-       launch {
-           val userDocRef = db.collection("users").document(userId)
-           try {
-               val snapshot = userDocRef.get().await()
+     suspend fun fetchUserData(userId: String){
+         val userDocRef = db.collection("users").document(userId)
+         try {
+             val snapshot = userDocRef.get().await()
 
-               snapshot?.let { documentSnapshot ->
-                   val user = documentSnapshot.toObject(Users::class.java)
-                   userData.postValue(user!!)
-               }
-           } catch (e: Exception) {
-               Log.e("ProileViewmodelFetchData",e.message.toString())
-           }
-       }
+             snapshot?.let { documentSnapshot ->
+                 val user = documentSnapshot.toObject(Users::class.java)
+                 userData.postValue(user!!)
+             }
+         } catch (e: Exception) {
+             Log.e("ProileViewmodelFetchData",e.message.toString())
+         }
     }
 
-     fun fetchPosts() {
-        launch {
-            val postsCollectionRef = db.collection("posts")
-            try {
-                val querySnapshot = postsCollectionRef.whereEqualTo("senderID", auth.uid).get().await()
+     suspend fun fetchPosts() {
+         val postsCollectionRef = db.collection("posts")
+         try {
+             val querySnapshot = postsCollectionRef.whereEqualTo("senderID", auth.uid).get().await()
 
-                val postsList = mutableListOf<Posts>()
-                for (document in querySnapshot) {
-                    val post = document.toObject(Posts::class.java)
-                    postsList.add(post)
-                }
+             val postsList = mutableListOf<Posts>()
+             for (document in querySnapshot) {
+                 val post = document.toObject(Posts::class.java)
+                 postsList.add(post)
+             }
 
-                (postsData as MutableLiveData<List<Posts>>).postValue(postsList)
-            } catch (e: Exception) {
-                Log.e("HomeViewModel", "Error fetching posts: ${e.message}")
+             (postsData as MutableLiveData<List<Posts>>).postValue(postsList)
+         } catch (e: Exception) {
+             Log.e("HomeViewModel", "Error fetching posts: ${e.message}")
+         }
+    }
+
+    suspend fun updateUserData(userId: String) {
+        val userDocRef = db.collection("users").document(userId)
+        try {
+            val snapshot = userDocRef.get().await()
+
+            snapshot?.let { documentSnapshot ->
+                val user = documentSnapshot.toObject(Users::class.java)
+                userData.postValue(user!!)
+                checkUpdateUserData.postValue(false)
             }
+        } catch (e: Exception) {
+            Log.e("ProileViewmodelFetchData",e.message.toString())
         }
+
     }
-
-
 }

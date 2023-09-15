@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.SimpleDateFormat
@@ -50,8 +52,14 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
         binding = FragmentShareBinding.bind(view)
         viewModel = ViewModelProvider(this)[ShareViewModel::class.java]
 
-        fetchUserData(auth.uid!!)
-        setupButtonsClick()
+        CoroutineScope(Dispatchers.IO).launch{
+            viewModel.fetchUserData(auth.uid!!)
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            getUserData()
+            setupButtonsClick()
+        }
+
 
 
     }
@@ -63,15 +71,7 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
         }
     }
 
-    private fun fetchUserData(userId: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                viewModel.fetchUserData(userId)
-            } catch (e: Exception) {
-                Log.e("ShareFetchData", e.message.toString())
-            }
-        }
-
+    private fun getUserData() {
         viewModel.userData.observe(viewLifecycleOwner) { user ->
             glide.load(user.details?.profileImg)
                 .placeholder(R.mipmap.ic_none_img)
@@ -83,7 +83,7 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
     }
 
     private fun savePostToDb(post: Posts) {
-        viewLifecycleOwner.lifecycleScope.launch {
+
             viewModel.userData.observe(viewLifecycleOwner) { user ->
                 post.postID = UUID.randomUUID().toString()
                 post.date = SimpleDateFormat("dd/M/yyyy hh:mm").format(Date())
@@ -112,7 +112,7 @@ class ShareFragment : Fragment(R.layout.fragment_share) {
                 findNavController().navigate(R.id.action_shareFragment_to_homeFragment)
 
             }
-        }
+
     }
 
     private suspend fun uploadImageToFirebaseStorage(uri: Uri): String {

@@ -9,5 +9,6 @@ data class Posts(
     var text: String? = null,
     var postImg: String? = null,
     var date: String? = null,
-    var like: Int? = null
+    var like: Int? = null,
+    var likeUsers: List<String>? = null
 )

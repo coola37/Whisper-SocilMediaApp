@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_homeFragment_to_profileViewerFragment"
             app:destination="@id/profileViewerFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -133,6 +136,9 @@
         <action
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
@@ -175,5 +181,23 @@
         <action
             android:id="@+id/action_profileViewerFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_profileViewerFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/postViewerFragment"
+        android:name="com.example.anew.view.PostViewerFragment"
+        android:label="fragment_post_viewer"
+        tools:layout="@layout/fragment_post_viewer" >
+        <action
+            android:id="@+id/action_postViewerFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_postViewerFragment_to_profileViewerFragment"
+            app:destination="@id/profileViewerFragment" />
+        <action
+            android:id="@+id/action_postViewerFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
 </navigation>

@@ -12,19 +12,24 @@ import com.example.anew.model.Posts
 
 class HomePostsAdapter(
     private var dataList: List<Posts>,
-    private val onProfileImageClickListener: OnProfileImageClickListener
+    private val onProfileImageClickListener: OnProfileImageClickListener,
+    private val onLikeButtonClickListener: OnProfileImageClickListener,
+    private val onTextClickListener: OnProfileImageClickListener
+
 ) :
     RecyclerView.Adapter<HomePostsAdapter.ViewHolder>() {
 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageProfil: ImageView = itemView.findViewById(R.id.imageProfil)
+        val imageProfil: ImageView = itemView.findViewById(R.id.imagePostProfil)
         val imageViewPostimg: ImageView = itemView.findViewById(R.id.imageViewPostImg)
         val textViewName: TextView = itemView.findViewById(R.id.textViewName)
         val textViewUsername: TextView = itemView.findViewById(R.id.textViewUsername)
         val textViewDate: TextView = itemView.findViewById(R.id.textViewDate)
         val textViewPostText: TextView = itemView.findViewById(R.id.textViewPostText)
         val textViewLikeCount: TextView = itemView.findViewById(R.id.textViewLikeCount)
+        val imageViewLike: ImageView = itemView.findViewById(R.id.imageViewLike)
+        val imageViewComments: ImageView = itemView.findViewById(R.id.imageViewComment)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -48,10 +53,18 @@ class HomePostsAdapter(
 
         holder.imageProfil.setOnClickListener {
             val senderId = data.senderID
-            if (senderId != null) {
-                onProfileImageClickListener.onProfileImageClick(senderId)
-            }
+            onProfileImageClickListener.onProfileImageClick(senderId!!)
+
         }
+        holder.imageViewLike.setOnClickListener {
+            val postId = data.postID
+            onLikeButtonClickListener.onProfileImageClick(postId!!)
+        }
+        holder.textViewPostText.setOnClickListener {
+            val postId = data.postID
+            onTextClickListener.onProfileImageClick(postId!!)
+        }
+
     }
 
     fun setData(newDataList: List<Posts>) {
@@ -61,7 +74,5 @@ class HomePostsAdapter(
     override fun getItemCount(): Int {
         return dataList.size
     }
-
-
 
 }

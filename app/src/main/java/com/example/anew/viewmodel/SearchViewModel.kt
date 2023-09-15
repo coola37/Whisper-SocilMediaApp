@@ -45,40 +45,36 @@ class SearchViewModel @Inject constructor(
     fun showUsers(usersList : List<Users>){
         usersData.value = usersList
     }
-    fun fetchUsers() {
-        launch {
-            val usersCollectionRef = db.collection("users")
-            try {
-                val querySnapshot = usersCollectionRef.get().await()
+    suspend fun fetchUsers() {
+        val usersCollectionRef = db.collection("users")
+        try {
+            val querySnapshot = usersCollectionRef.get().await()
 
-                val usersList = mutableListOf<Users>()
-                for (document in querySnapshot){
-                    val user = document.toObject(Users::class.java)
-                    usersList.add(user)
-                }
-                (usersData as MutableLiveData<List<Users>>).postValue(usersList)
-                usersNameMap.clear()
-                usersNameMap.putAll(usersList.filter { it.username != null}.associateBy{ it.username!!})
-            }catch (e: Exception){
-                Log.e("SearchViewModelFetchUsers", e.message.toString())
+            val usersList = mutableListOf<Users>()
+            for (document in querySnapshot){
+                val user = document.toObject(Users::class.java)
+                usersList.add(user)
             }
+            (usersData as MutableLiveData<List<Users>>).postValue(usersList)
+            usersNameMap.clear()
+            usersNameMap.putAll(usersList.filter { it.username != null}.associateBy{ it.username!!})
+        }catch (e: Exception){
+            Log.e("SearchViewModelFetchUsers", e.message.toString())
         }
 
     }
 
-    fun fetchUserData(userId: String){
-        launch {
-            val userDocRef = db.collection("users").document(userId)
-            try {
-                val snapshot = userDocRef.get().await()
+    suspend fun fetchUserData(userId: String){
+        val userDocRef = db.collection("users").document(userId)
+        try {
+            val snapshot = userDocRef.get().await()
 
-                snapshot?.let { documentSnapshot ->
-                    val user = documentSnapshot.toObject(Users::class.java)
-                    currencyUser.postValue(user!!)
-                }
-            } catch (e: Exception) {
-                Log.e("SearchViewModelFetchCurrencyUser",e.message.toString())
+            snapshot?.let { documentSnapshot ->
+                val user = documentSnapshot.toObject(Users::class.java)
+                currencyUser.postValue(user!!)
             }
+        } catch (e: Exception) {
+            Log.e("SearchViewModelFetchCurrencyUser",e.message.toString())
         }
     }
 

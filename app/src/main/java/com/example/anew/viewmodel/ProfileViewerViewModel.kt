@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.anew.model.Posts
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -20,6 +21,9 @@ import javax.inject.Inject
     val checkFollowing: MutableLiveData<Boolean> = MutableLiveData()
     val checkUserUpdate: MutableLiveData<Boolean> = MutableLiveData()
     val buttonCheck: MutableLiveData<Boolean> = MutableLiveData()
+
+
+
 
     suspend fun fetchUserData(userId: String){
         val userDocRef = db.collection("users").document(userId)
@@ -102,4 +106,64 @@ import javax.inject.Inject
             }
         }
     }
+
+
+     fun followUser(senderId: String) {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val currentUserUid = user.uid
+            val usersCollection = db.collection("users")
+            val followedUserRef = usersCollection.document(senderId)
+            val currentUserRef = usersCollection.document(currentUserUid)
+
+            followedUserRef.update(
+                "details.listFollowers", FieldValue.arrayUnion(auth.uid),
+                "details.followers", FieldValue.increment(1)
+            ).addOnSuccessListener {
+                Log.d("FollowUser", "User followed")
+
+                currentUserRef.update(
+                    "details.listFollow", FieldValue.arrayUnion(senderId),
+                    "details.followed", FieldValue.increment(1)
+                ).addOnSuccessListener {
+                    Log.d("FollowUser", "User follower added")
+                    checkUserUpdate.postValue(true)
+                }.addOnFailureListener { e ->
+                    Log.e("FollowUser", e.message.toString())
+                }
+            }.addOnFailureListener { e ->
+                Log.e("FollowUser", e.message.toString())
+            }
+        }
+    }
+
+     fun unfollowUser(senderId: String) {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val currentUserUid = user.uid
+            val usersCollection = db.collection("users")
+            val followedUserRef = usersCollection.document(senderId)
+            val currentUserRef = usersCollection.document(currentUserUid)
+
+            followedUserRef.update(
+                "details.listFollowers", FieldValue.arrayRemove(auth.uid),
+                "details.followers", FieldValue.increment(-1)
+            ).addOnSuccessListener {
+                Log.d("UnfollowUser", "User unfollowed")
+
+                currentUserRef.update(
+                    "details.listFollow", FieldValue.arrayRemove(senderId),
+                    "details.followed", FieldValue.increment(-1)
+                ).addOnSuccessListener {
+                    Log.d("UnfollowUser", "User unfollower removed")
+                    checkUserUpdate.postValue(true)
+                }.addOnFailureListener { e ->
+                    Log.e("UnfollowUser", e.message.toString())
+                }
+            }.addOnFailureListener { e ->
+                Log.e("UnfollowUser", e.message.toString())
+            }
+        }
+    }
+
 }

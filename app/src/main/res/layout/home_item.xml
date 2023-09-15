@@ -41,12 +41,12 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/imageProfil"
+            app:layout_constraintStart_toEndOf="@+id/imagePostProfil"
             app:layout_constraintTop_toBottomOf="@+id/view4" />
 
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imageProfil"
+            android:id="@+id/imagePostProfil"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@mipmap/ic_launcher"

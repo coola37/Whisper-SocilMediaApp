@@ -28,6 +28,7 @@ class EditProfileViewModel @Inject constructor(
     application: Application
 ) : BaseViewModel(application)  {
     val userData: MutableLiveData<Users> = MutableLiveData()
+    val checkUserupdate: MutableLiveData<Boolean> = MutableLiveData()
 
      suspend fun uploadProfileImageAndGetUrl(userID: String, imgUri: Uri): String {
         return withContext(Dispatchers.IO) {
@@ -64,12 +65,14 @@ class EditProfileViewModel @Inject constructor(
 
             try {
                 userDocRef.update(updateData as Map<String, Any>).await()
+                checkUserupdate.postValue(true)
             } catch (e: Exception) {
                 Log.e("EditProfileViewModel", "Error uploading and setting profile image: ${e.message}", e)
             }
         }
     }
 
+    fun setCheckUpdate(case: Boolean){ checkUserupdate.postValue(case)}
      fun uploadAndSetProfileImage(userId: String, imgUri: Uri, name: String, bio: String) {
         launch {
             val imageUrl = uploadProfileImageAndGetUrl(userId, imgUri)
@@ -92,5 +95,32 @@ class EditProfileViewModel @Inject constructor(
            }
        }
     }
+
+    fun updateSenderImgInPosts(authUid: String, profileImageUrl: String, name: String) {
+        launch {
+            val postsCollectionRef = db.collection("posts")
+
+            try {
+                val query = postsCollectionRef.whereEqualTo("senderID", authUid)
+                val querySnapshot = query.get().await()
+
+                for (document in querySnapshot.documents) {
+                    // Update the senderImg field for each matching post
+                    val postRef = postsCollectionRef.document(document.id)
+                    val updateDataImg = hashMapOf<String, Any>(
+                        "senderImg" to profileImageUrl
+                    )
+                    val updateDataName = hashMapOf<String, Any>(
+                        "senderName" to name
+                    )
+                    postRef.update(updateDataImg).await()
+                    postRef.update(updateDataName).await()
+                }
+            } catch (e: Exception) {
+                Log.e("EditProfileViewModel", "Error updating senderImg in posts: ${e.message}", e)
+            }
+        }
+    }
+
 }
 

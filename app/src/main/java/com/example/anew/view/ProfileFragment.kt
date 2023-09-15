@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,9 +20,12 @@ import com.example.anew.R
 import com.example.anew.adapter.HomePostsAdapter
 import com.example.anew.adapter.OnProfileImageClickListener
 import com.example.anew.databinding.FragmentProfileBinding
+import com.example.anew.viewmodel.EditProfileViewModel
 import com.example.anew.viewmodel.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,41 +39,52 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     lateinit var auth: FirebaseAuth
     private lateinit var profileViewModel: ProfileViewModel
     private lateinit var adapter: HomePostsAdapter
+    private lateinit var editProfileViewModel: EditProfileViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentProfileBinding.bind(view)
         profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
-        setupButtons()
-        profileViewModel.fetchPosts()
-        fetchUserData(auth.uid!!)
+        editProfileViewModel = ViewModelProvider(this)[EditProfileViewModel::class.java]
 
-        adapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
-            override fun onProfileImageClick(senderId: String) {
 
-            }
-        })
-
-        profileViewModel.postsData.observe(viewLifecycleOwner){
-            adapter.setData(it)
-
-            val layoutManager = LinearLayoutManager(requireContext())
-            binding.profileRecycler.layoutManager = layoutManager
-            binding.profileRecycler.adapter = adapter
+        CoroutineScope(Dispatchers.IO).launch {
+            profileViewModel.fetchUserData(auth.uid!!)
+            profileViewModel.fetchPosts()
         }
 
+        CoroutineScope(Dispatchers.Main).launch{
+            getUserData()
+            setupButtons()
+            adapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+                override fun onProfileImageClick(senderId: String) {
+
+                }
+            }, object : OnProfileImageClickListener{
+                override fun onProfileImageClick(senderId: String) {
+
+                }
+
+            }, object : OnProfileImageClickListener{
+                override fun onProfileImageClick(senderId: String) {
+                    findNavController().navigate(R.id.action_homeFragment_to_postViewerFragment,
+                        bundleOf("postID" to senderId)
+                    )
+                }
+            })
+
+            profileViewModel.postsData.observe(viewLifecycleOwner){
+                adapter.setData(it)
+
+                val layoutManager = LinearLayoutManager(requireContext())
+                binding.profileRecycler.layoutManager = layoutManager
+                binding.profileRecycler.adapter = adapter
+            }
+        }
     }
 
 
-
-    private fun fetchUserData(userId: String) {
-
-        try {
-                profileViewModel.fetchUserData(userId)
-        } catch (e: Exception) {
-                Log.e("profileFragmentFetchUser", e.message.toString())
-        }
-
+    private fun getUserData() {
 
         profileViewModel.userData.observe(viewLifecycleOwner) { user ->
 
@@ -97,5 +112,24 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        editProfileViewModel.checkUserupdate.observe(viewLifecycleOwner){
+            CoroutineScope(Dispatchers.Main).launch {
+                if(it){
+                    profileViewModel.updateUserData(auth.uid!!)
 
+                    val checkCase = profileViewModel.checkUpdateUserData.value
+
+                    profileViewModel.userData.observe(viewLifecycleOwner){
+
+                    }
+
+                    editProfileViewModel.checkUserupdate.postValue(checkCase)
+                }else{
+                    Log.d("User Data", "Data is current")
+                }
+            }
+        }
+    }
 }

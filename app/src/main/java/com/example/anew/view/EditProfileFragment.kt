@@ -67,11 +67,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 lifecycleScope.launch {
                     val imageUrl = viewModel.uploadProfileImageAndGetUrl(auth.currentUser!!.uid, selectedImageUri)
                     viewModel.updateProfileData(auth.currentUser!!.uid, name, bio, imageUrl)
+                    viewModel.updateSenderImgInPosts(auth.currentUser!!.uid, imageUrl, name) // Update senderImg in posts
                     Log.e("imageUrl", imageUrl)
                     findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
                 }
             }else{
                 viewModel.updateProfileData(auth.currentUser!!.uid, name, bio, profileUrl)
+                viewModel.updateSenderImgInPosts(auth.currentUser!!.uid, profileUrl, name)
                 findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
             }
         }
