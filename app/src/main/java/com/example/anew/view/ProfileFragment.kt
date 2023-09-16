@@ -1,24 +1,18 @@
 package com.example.anew.view
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
 import com.example.anew.adapter.HomePostsAdapter
-import com.example.anew.adapter.OnProfileImageClickListener
+import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.databinding.FragmentProfileBinding
 import com.example.anew.viewmodel.EditProfileViewModel
 import com.example.anew.viewmodel.ProfileViewModel
@@ -56,16 +50,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         CoroutineScope(Dispatchers.Main).launch{
             getUserData()
             setupButtons()
-            adapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+            adapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData{
                 override fun onProfileImageClick(senderId: String) {
 
                 }
-            }, object : OnProfileImageClickListener{
+            }, object : OnClickListenerCatchData{
                 override fun onProfileImageClick(senderId: String) {
 
                 }
 
-            }, object : OnProfileImageClickListener{
+            }, object : OnClickListenerCatchData{
                 override fun onProfileImageClick(senderId: String) {
                     findNavController().navigate(R.id.action_homeFragment_to_postViewerFragment,
                         bundleOf("postID" to senderId)

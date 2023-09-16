@@ -1,5 +1,5 @@
 package com.example.anew.adapter
 
-interface OnProfileImageClickListener {
+interface OnClickListenerCatchData {
     fun onProfileImageClick(senderId: String)
 }

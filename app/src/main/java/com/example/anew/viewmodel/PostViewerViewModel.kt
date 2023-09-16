@@ -25,7 +25,9 @@ class PostViewerViewModel @Inject constructor(
     val postsData: MutableLiveData<Posts> = MutableLiveData()
     val checkUpdate: MutableLiveData<Boolean> = MutableLiveData()
     val checkLike: MutableLiveData<Boolean> = MutableLiveData()
-    val commentsData: MutableLiveData<Comments> = MutableLiveData()
+    val commentsData: MutableLiveData<List<Comments>> = MutableLiveData()
+    val checkLikeForComments: MutableLiveData<Boolean> = MutableLiveData()
+    val checkUpdateComments: MutableLiveData<Boolean> = MutableLiveData()
 
     suspend fun refreshPostData(postId: String){
         val postsCollectionRef = db.collection("posts").document(postId)
@@ -39,8 +41,25 @@ class PostViewerViewModel @Inject constructor(
         }catch (e: Exception){
             Log.e("PostViewerViewModel_refreshPostData", e.message.toString())
         }
+
     }
 
+    suspend fun refreshCommentsData(postId: String){
+        val commentsCollectionRef = db.collection("comments")
+        try {
+            val querySnapshot = commentsCollectionRef.whereEqualTo("postID", postId).get().await()
+
+
+            val commentsList = mutableListOf<Comments>()
+            for (document in querySnapshot){
+                val comment = document.toObject(Comments::class.java)
+                commentsList.add(comment)
+            }
+            (commentsData as MutableLiveData<List<Comments>>).postValue(commentsList)
+        }catch (e: java.lang.Exception){
+            Log.e("PostViewerVM fetchComments", e.message.toString())
+        }
+    }
     suspend fun fetchPostData(postId: String){
         val postsCollectionRef = db.collection("posts").document(postId)
         try {
@@ -51,6 +70,24 @@ class PostViewerViewModel @Inject constructor(
             }
         }catch (e: Exception){
             Log.e("PostViewerViewModel_fetchPostData", e.message.toString())
+        }
+    }
+
+
+    suspend fun fetchCommentsData(postId: String){
+        val commentsCollectionRef = db.collection("comments")
+        try {
+            val querySnapshot = commentsCollectionRef.whereEqualTo("postID", postId).get().await()
+
+
+            val commentsList = mutableListOf<Comments>()
+            for (document in querySnapshot){
+                val comment = document.toObject(Comments::class.java)
+                commentsList.add(comment)
+            }
+            (commentsData as MutableLiveData<List<Comments>>).postValue(commentsList)
+        }catch (e: java.lang.Exception){
+            Log.e("PostViewerVM fetchComments", e.message.toString())
         }
     }
 
@@ -77,6 +114,55 @@ class PostViewerViewModel @Inject constructor(
                 val postData = it.toObject(Posts::class.java)
                 val checkLikes = postData?.likeUsers?.any{ it == userId  }  == true
                 checkLike.postValue(checkLikes)
+            }
+
+        }
+    }
+
+    fun checkLikeForComments(commentId: String){
+        auth.currentUser?.let {
+
+            val userId = auth.uid
+            val postRef = db.collection("comments").document(commentId)
+            postRef.get().addOnSuccessListener {
+                val commentData = it.toObject(Comments::class.java)
+                val checkLikes = commentData?.likeUsers?.any{ it == userId  }  == true
+                checkLikeForComments.postValue(checkLikes)
+            }
+
+        }
+    }
+
+    fun likeForComments(commentId: String){
+        val userId = auth.uid
+        auth.currentUser?.let {
+            val commentRef = db.collection("comments").document(commentId)
+
+            commentRef.update(
+                "likeUsers", FieldValue.arrayUnion(userId),
+                "likeCounts", FieldValue.increment(1)
+            ).addOnSuccessListener {
+                Log.d("Comment Post ", "Comment liked")
+                checkUpdateComments.postValue(true)
+            }.addOnFailureListener {
+                Log.e("Comment Like ", it.message.toString())
+            }
+        }
+    }
+
+    fun disLikeForComments(commentId: String){
+        val userId = auth.uid
+        auth.currentUser?.let {
+
+            val commentRef = db.collection("comments").document(commentId)
+            commentRef.update(
+                "likeUsers", FieldValue.arrayRemove(userId),
+                "likeCounts", FieldValue.increment(-1)
+            ).addOnSuccessListener {
+                Log.d("comment dislike", "post disliked")
+                checkUpdateComments.postValue(true)
+            }.addOnFailureListener {
+                Log.e("comment dislike", it.message.toString())
             }
 
         }
@@ -112,7 +198,6 @@ class PostViewerViewModel @Inject constructor(
             }.addOnFailureListener {
                 Log.e("post dislike", it.message.toString())
             }
-
         }
     }
 
@@ -124,8 +209,5 @@ class PostViewerViewModel @Inject constructor(
         }
     }
 
-    suspend fun fetchCommentsData(){
-
-    }
 
 }

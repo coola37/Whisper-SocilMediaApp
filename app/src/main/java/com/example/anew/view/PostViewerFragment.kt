@@ -4,10 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
+import com.example.anew.adapter.CommentsAdapter
+import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.databinding.FragmentPostViewerBinding
 import com.example.anew.model.Comments
 import com.example.anew.viewmodel.PostViewerViewModel
@@ -16,8 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+ import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -32,9 +36,12 @@ class PostViewerFragment : Fragment(R.layout.fragment_post_viewer) {
     internal lateinit var glide: RequestManager
     private lateinit var binding: FragmentPostViewerBinding
     private lateinit var viewModel: PostViewerViewModel
+    private lateinit var commentsAdapter: CommentsAdapter
+
     private var postID: String =""
     private var username: String =""
     private var senderProfileImg: String =""
+    private var senderId: String =""
 
     companion object {
         fun newInstance(postID: String) : PostViewerFragment {
@@ -55,11 +62,36 @@ class PostViewerFragment : Fragment(R.layout.fragment_post_viewer) {
         CoroutineScope(Dispatchers.IO).launch {
             viewModel.fetchUserData(auth.uid!!)
             viewModel.fetchPostData(postID)
+            viewModel.fetchCommentsData(postID)
 
         }
         CoroutineScope(Dispatchers.Main).launch {
             getPostData()
             getUserData()
+        }
+
+        commentsAdapter = CommentsAdapter(emptyList(), object : OnClickListenerCatchData{
+            override fun onProfileImageClick(senderId: String) {
+                if(auth.uid != senderId){
+                    findNavController().navigate(R.id.action_postViewerFragment_to_profileViewerFragment,
+                        bundleOf("senderId" to senderId))
+                }else{
+                    findNavController().navigate(R.id.action_postViewerFragment_to_profileFragment)
+                }
+            }
+        },
+        object : OnClickListenerCatchData{
+            override fun onProfileImageClick(senderId: String) {
+               likeAndDislikeForComments(senderId)
+            }
+
+        })
+
+        viewModel.commentsData.observe(viewLifecycleOwner){
+            commentsAdapter.setData(it)
+            val layoutManager = LinearLayoutManager(requireContext())
+            binding.recyclerComments.layoutManager = layoutManager
+            binding.recyclerComments.adapter = commentsAdapter
         }
 
         setupButtonClick()
@@ -71,14 +103,23 @@ class PostViewerFragment : Fragment(R.layout.fragment_post_viewer) {
         viewModel.checkLike.observe(viewLifecycleOwner){
             if(it){
                 viewModel.disLike(postID)
-                CoroutineScope(Dispatchers.Main).launch{
-                    viewModel.refreshPostData(postID)
-                }
+                CoroutineScope(Dispatchers.Main).launch{ viewModel.refreshPostData(postID) }
             }else{
                 viewModel.like(postID)
-                CoroutineScope(Dispatchers.Main).launch{
-                    viewModel.refreshPostData(postID)
-                }
+                CoroutineScope(Dispatchers.Main).launch{ viewModel.refreshPostData(postID) }
+            }
+        }
+    }
+
+    private fun likeAndDislikeForComments(commentId: String){
+        CoroutineScope(Dispatchers.IO).launch{viewModel.checkLikeForComments(commentId)}
+        viewModel.checkLikeForComments.observe(viewLifecycleOwner){
+            if(it){
+                viewModel.disLikeForComments(commentId)
+                CoroutineScope(Dispatchers.Main).launch{viewModel.refreshCommentsData(postID)}
+            }else{
+                viewModel.likeForComments(commentId)
+                CoroutineScope(Dispatchers.Main).launch { viewModel.refreshCommentsData(postID) }
             }
         }
     }
@@ -87,6 +128,7 @@ class PostViewerFragment : Fragment(R.layout.fragment_post_viewer) {
 
     private fun getPostData(){
         viewModel.postsData.observe(viewLifecycleOwner){
+            senderId = it.senderID!!
             binding.textViewName.text = it.senderName
             binding.textViewUsername.text = it.senderUsername
             binding.textViewPostText.text = it.text

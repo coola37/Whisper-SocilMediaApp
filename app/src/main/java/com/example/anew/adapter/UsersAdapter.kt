@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.anew.R
@@ -13,7 +12,7 @@ import com.example.anew.model.Users
 
 class UsersAdapter(
     private var dataList: List<Users>,
-    private val onProfileImageClickListener: OnProfileImageClickListener
+    private val onClickListenerCatchData: OnClickListenerCatchData
 ) :RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -42,7 +41,7 @@ class UsersAdapter(
         holder.profileImg.setOnClickListener {
             val senderId = data.userId
             senderId?.let { it ->
-                onProfileImageClickListener?.onProfileImageClick(it)
+                onClickListenerCatchData?.onProfileImageClick(it)
             }
         }
 

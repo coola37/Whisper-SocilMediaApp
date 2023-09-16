@@ -40,7 +40,7 @@
             android:fontFamily="@font/archivo_narrow"
             android:text="TextView"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="@+id/textViewCommentsUsername"
             app:layout_constraintTop_toBottomOf="@+id/textViewCommentsUsername" />
 
@@ -51,7 +51,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="@+id/commentText"
             app:layout_constraintTop_toBottomOf="@+id/commentText"
-            app:srcCompat="@drawable/ic_like" />
+            app:srcCompat="@drawable/ic_like_active" />
 
         <TextView
             android:id="@+id/textViewLikeCountComments"

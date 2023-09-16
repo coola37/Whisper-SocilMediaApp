@@ -56,6 +56,7 @@ class HomeViewModel @Inject constructor(
 
         }
     }
+
     fun like(postId: String){
         val userId = auth.uid
         auth.currentUser?.let {

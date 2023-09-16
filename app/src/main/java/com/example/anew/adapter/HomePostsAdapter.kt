@@ -12,12 +12,11 @@ import com.example.anew.model.Posts
 
 class HomePostsAdapter(
     private var dataList: List<Posts>,
-    private val onProfileImageClickListener: OnProfileImageClickListener,
-    private val onLikeButtonClickListener: OnProfileImageClickListener,
-    private val onTextClickListener: OnProfileImageClickListener
+    private val onClickListenerCatchData: OnClickListenerCatchData,
+    private val onLikeButtonClickListener: OnClickListenerCatchData,
+    private val onTextClickListener: OnClickListenerCatchData
 
-) :
-    RecyclerView.Adapter<HomePostsAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<HomePostsAdapter.ViewHolder>() {
 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -53,7 +52,7 @@ class HomePostsAdapter(
 
         holder.imageProfil.setOnClickListener {
             val senderId = data.senderID
-            onProfileImageClickListener.onProfileImageClick(senderId!!)
+            onClickListenerCatchData.onProfileImageClick(senderId!!)
 
         }
         holder.imageViewLike.setOnClickListener {

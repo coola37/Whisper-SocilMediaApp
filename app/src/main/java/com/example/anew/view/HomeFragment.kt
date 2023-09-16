@@ -12,7 +12,7 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
 import com.example.anew.adapter.HomePostsAdapter
-import com.example.anew.adapter.OnProfileImageClickListener
+import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.databinding.FragmentHomeBinding
 import com.example.anew.viewmodel.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -55,7 +55,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
             CoroutineScope(Dispatchers.Main).launch{
                 fetchUserData()
-                postsAdapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+                postsAdapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData{
                     override fun onProfileImageClick(senderId: String) {
                         val fragment = ProfileViewerFragment.newInstance(senderId)
                         if(senderId == auth.uid){
@@ -66,7 +66,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         }
 
                     }
-                }, object : OnProfileImageClickListener{
+                }, object : OnClickListenerCatchData{
                     override fun onProfileImageClick(senderId: String) {
                         CoroutineScope(Dispatchers.IO).launch { viewModel.checkLike(senderId) }
                         viewModel.checkLike.observe(viewLifecycleOwner){
@@ -90,7 +90,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         }
                     }
 
-                }, object : OnProfileImageClickListener{
+                }, object : OnClickListenerCatchData{
                     override fun onProfileImageClick(senderId: String) {
                         findNavController().navigate(R.id.action_homeFragment_to_postViewerFragment,
                             bundleOf("postID" to senderId))
@@ -109,6 +109,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
     }
+
 
 
     private fun setupBottomNavigationView(){

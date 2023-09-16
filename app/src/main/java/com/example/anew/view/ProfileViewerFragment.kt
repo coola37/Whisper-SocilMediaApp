@@ -2,35 +2,26 @@ package com.example.anew.view
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
-import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
 import com.example.anew.adapter.HomePostsAdapter
-import com.example.anew.adapter.OnProfileImageClickListener
+import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.databinding.FragmentProfileViewerBinding
-import com.example.anew.model.Users
 import com.example.anew.viewmodel.ProfileViewerViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FieldValue.arrayUnion
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
@@ -88,16 +79,16 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
         }
 
 
-        adapter = HomePostsAdapter(emptyList(), object : OnProfileImageClickListener{
+        adapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData{
             override fun onProfileImageClick(senderId: String) {
 
             }
-        },object : OnProfileImageClickListener{
+        },object : OnClickListenerCatchData{
             override fun onProfileImageClick(senderId: String) {
 
             }
 
-        }, object : OnProfileImageClickListener{
+        }, object : OnClickListenerCatchData{
             override fun onProfileImageClick(senderId: String) {
                 findNavController().navigate(R.id.action_homeFragment_to_postViewerFragment,
                     bundleOf("postID" to senderId))
