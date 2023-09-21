@@ -6,5 +6,6 @@ data class Messages(
     var recevierId: String? = null,
     var msgText: String? = null,
     var date: String? = null,
-    var senderUsername: String? = null
+    var senderUsername: String? = null,
+    var senderProfileImg: String? = null
 )

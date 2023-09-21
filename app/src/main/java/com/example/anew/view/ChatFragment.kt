@@ -52,6 +52,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private lateinit var receiverId : String
     private var senderUsername: String = ""
     private lateinit var adapter : ChatAdapter
+    private var senderProfileImg: String = ""
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChatBinding.bind(view)
@@ -84,6 +85,14 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
            CoroutineScope(Dispatchers.Main).launch {
                sendMessage()
                binding.editTextTextMsg.text.clear()
+
+               viewModel.checkGetMessages.observe(viewLifecycleOwner){
+                   if (it){
+                       CoroutineScope(Dispatchers.Main).launch { viewModel.RefreshMessagesData(auth.uid.toString(), receiverId) }
+                   }else{
+                       Log.d("Chat Data", "chat data is currency")
+                   }
+               }
            }
         }
 
@@ -95,7 +104,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val date = SimpleDateFormat("dd/M/yyyy hh:mm").format(Date())
         val msgId = UUID.randomUUID().toString()
 
-        val msg = Messages(msgId, auth.uid, receiverId, msgText, date, senderUsername)
+        val msg = Messages(msgId, auth.uid, receiverId, msgText, date, senderUsername, senderProfileImg)
 
         CoroutineScope(Dispatchers.Main).launch { viewModel.saveMsgToDb(msg) }
     }
@@ -117,6 +126,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     private fun getSenderUserData(){
         viewModel.senderUser.observe(viewLifecycleOwner){
             senderUsername = it.username!!
+            senderProfileImg = it.details?.profileImg!!
         }
     }
 

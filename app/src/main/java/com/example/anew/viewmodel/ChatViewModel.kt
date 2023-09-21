@@ -22,6 +22,7 @@ class ChatViewModel @Inject constructor(
     val senderUser: MutableLiveData<Users> = MutableLiveData()
     val receiverUser: MutableLiveData<Users> = MutableLiveData()
     val msgData: MutableLiveData<List<Messages>> = MutableLiveData()
+    val checkGetMessages: MutableLiveData<Boolean> = MutableLiveData()
 
     suspend fun fetchSenderUser(userId: String){
         val userDocRef = db.collection("users").document(userId)
@@ -69,6 +70,25 @@ class ChatViewModel @Inject constructor(
 
     }
 
+    suspend fun RefreshMessagesData(senderId: String, receiverId: String){
+        val senderChannel = receiverId + senderId
+        val receiverChannel = senderId + receiverId
+        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats")
+        try {
+            val querySnapshot = msgCollectionRef.get().await()
+            val msgList = mutableListOf<Messages>()
+            for(document in querySnapshot){
+                val msg = document.toObject(Messages::class.java)
+                msgList.add(msg)
+            }
+            (msgData as MutableLiveData<List<Messages>>).postValue(msgList)
+            checkGetMessages.postValue(false)
+        }catch (e: java.lang.Exception){
+            Log.e("fetchMessages", e.message.toString())
+        }
+
+    }
+
 
     suspend fun saveMsgToDb(msg: Messages) {
         val senderChannel = msg.recevierId + msg.senderId
@@ -79,8 +99,7 @@ class ChatViewModel @Inject constructor(
                 .collection("chats").document(msg.messageId ?: "").set(msg).await()
             db.collection("messages").document(receiverChannel ?: "").collection("chats")
                 .document(msg.messageId ?: "").set(msg).await()
-
-
+            checkGetMessages.postValue(true)
         } catch (e: java.lang.Exception) {
             Log.e("Msg save to db error", e.message.toString())
         }
