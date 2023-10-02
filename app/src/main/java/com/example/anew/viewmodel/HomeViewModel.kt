@@ -28,7 +28,7 @@ class HomeViewModel @Inject constructor(
 
 
     suspend fun refreshPostData(){
-        val postsCollectionRef = db.collection("posts")
+        val postsCollectionRef = db.collection("posts").orderBy("date")
         try {
             val querySnapshot = postsCollectionRef.get().await()
 
@@ -92,7 +92,7 @@ class HomeViewModel @Inject constructor(
         }
     }
      suspend fun fetchPosts() {
-         val postsCollectionRef = db.collection("posts")
+         val postsCollectionRef = db.collection("posts").orderBy("date")
          try {
              val querySnapshot = postsCollectionRef.get().await()
 

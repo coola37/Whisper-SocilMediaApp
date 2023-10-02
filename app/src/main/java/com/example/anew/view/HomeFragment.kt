@@ -57,7 +57,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 fetchUserData()
                 postsAdapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData{
                     override fun onProfileImageClick(senderId: String) {
-                        val fragment = ProfileViewerFragment.newInstance(senderId)
                         if(senderId == auth.uid){
                             findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
                         }else{

@@ -54,8 +54,7 @@ class ChatViewModel @Inject constructor(
 
     suspend fun fetchMessages(senderId: String, receiverId: String){
         val senderChannel = receiverId + senderId
-        val receiverChannel = senderId + receiverId
-        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats")
+        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats").orderBy("date")
         try {
             val querySnapshot = msgCollectionRef.get().await()
             val msgList = mutableListOf<Messages>()
@@ -73,7 +72,7 @@ class ChatViewModel @Inject constructor(
     suspend fun RefreshMessagesData(senderId: String, receiverId: String){
         val senderChannel = receiverId + senderId
         val receiverChannel = senderId + receiverId
-        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats")
+        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats").orderBy("date")
         try {
             val querySnapshot = msgCollectionRef.get().await()
             val msgList = mutableListOf<Messages>()

@@ -3,9 +3,14 @@ package com.example.anew.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.example.anew.R
+import com.example.anew.utils.NetworkConnection
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setupAuthListener()
+        networkCheck()
 
     }
 
@@ -37,6 +43,28 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         authListener?.let {
             auth.removeAuthStateListener(authListener)
+        }
+    }
+
+    private fun networkCheck(){
+        val networkConnection = NetworkConnection(applicationContext)
+        lifecycleScope.launch{
+            networkConnection.observe(this@MainActivity, Observer{ isConnected->
+                if(isConnected){
+                    Toast.makeText(this@MainActivity,"Welcome To Pokemon List",Toast.LENGTH_LONG).show()
+                    Log.d("Network Check", "OK")
+                }
+
+                else{
+                    val mAlerDiaglog = MaterialAlertDialogBuilder(this@MainActivity)
+                    mAlerDiaglog.setTitle("INTERNET NOT FOUND")
+                    mAlerDiaglog.setMessage("Check your internet connection!")
+                    mAlerDiaglog.setIcon(R.mipmap.ic_launcher)
+                    mAlerDiaglog.setPositiveButton("Try again!"){dialog, i-> networkCheck()}
+                    mAlerDiaglog.setNegativeButton("Exit"){dialog, i-> finish()}
+                    mAlerDiaglog.show()
+                }
+            })
         }
     }
    private fun setupAuthListener(){
