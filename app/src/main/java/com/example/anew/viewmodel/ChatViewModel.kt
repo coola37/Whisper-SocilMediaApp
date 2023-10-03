@@ -54,7 +54,8 @@ class ChatViewModel @Inject constructor(
 
     suspend fun fetchMessages(senderId: String, receiverId: String){
         val senderChannel = receiverId + senderId
-        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats").orderBy("date")
+        val msgCollectionRef = db.collection("messages").document("channels")
+            .collection(senderChannel ?: "").orderBy("date")
         try {
             val querySnapshot = msgCollectionRef.get().await()
             val msgList = mutableListOf<Messages>()
@@ -72,7 +73,8 @@ class ChatViewModel @Inject constructor(
     suspend fun RefreshMessagesData(senderId: String, receiverId: String){
         val senderChannel = receiverId + senderId
         val receiverChannel = senderId + receiverId
-        val msgCollectionRef = db.collection("messages").document(senderChannel ?: "").collection("chats").orderBy("date")
+        val msgCollectionRef = db.collection("messages").document("channels")
+            .collection(senderChannel ?: "").orderBy("date")
         try {
             val querySnapshot = msgCollectionRef.get().await()
             val msgList = mutableListOf<Messages>()
@@ -94,9 +96,9 @@ class ChatViewModel @Inject constructor(
         val receiverChannel = msg.senderId + msg.recevierId
 
         try {
-            db.collection("messages").document(senderChannel ?: "")
-                .collection("chats").document(msg.messageId ?: "").set(msg).await()
-            db.collection("messages").document(receiverChannel ?: "").collection("chats")
+            db.collection("messages").document("channels")
+                .collection(senderChannel ?: "").document(msg.messageId ?: "").set(msg).await()
+            db.collection("messages").document("channels").collection(receiverChannel ?: "")
                 .document(msg.messageId ?: "").set(msg).await()
             checkGetMessages.postValue(true)
         } catch (e: java.lang.Exception) {

@@ -1,60 +1,76 @@
 package com.example.anew.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.RequestManager
 import com.example.anew.R
+import com.example.anew.adapter.OnClickListenerCatchData
+import com.example.anew.adapter.UsersAdapter
+import com.example.anew.databinding.FragmentInboxBinding
+import com.example.anew.viewmodel.InboxViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@AndroidEntryPoint
+class InboxFragment : Fragment(R.layout.fragment_inbox) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [InboxFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class InboxFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    @Inject
+    internal lateinit var auth: FirebaseAuth
+    @Inject
+    internal lateinit var db: FirebaseFirestore
+    @Inject
+    internal lateinit var glide: RequestManager
+    private lateinit var binding: FragmentInboxBinding
+    private lateinit var viewModel: InboxViewModel
+    private var mutuallyUsers: List<String> = emptyList()
+    private lateinit var adapter: UsersAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentInboxBinding.bind(view)
+        viewModel = ViewModelProvider(this)[InboxViewModel::class.java]
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_inbox, container, false)
-    }
+        auth.currentUser?.let {
+            CoroutineScope(Dispatchers.IO).launch {
+                viewModel.fetchUserData(auth.uid!!)
+            }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment InboxFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            InboxFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+            viewModel.userData.observe(viewLifecycleOwner){
+                mutuallyUsers = it.details?.listFollow!!
+                CoroutineScope(Dispatchers.Main).launch {
+                    viewModel.getChatUsers(mutuallyUsers)
                 }
             }
+
+            viewModel.chatUsers.observe(viewLifecycleOwner){
+                adapter = UsersAdapter(it, object : OnClickListenerCatchData{
+                    override fun onProfileImageClick(senderId: String) {
+                        findNavController().navigate(R.id.action_inboxFragment_to_chatFragment, bundleOf
+                            ("receiverId" to senderId))
+                    }
+                })
+
+                val layoutManager = LinearLayoutManager(requireContext())
+                binding.msgRecycler.layoutManager = layoutManager
+                binding.msgRecycler.adapter = adapter
+            }
+
+        }
+
+
     }
 }
