@@ -122,5 +122,24 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
+    fun updateImgInChatChannel(id: String, imgUrl: String){
+        launch {
+            val chRef = db.collection("chatChannels")
+            try {
+                val query = chRef.whereEqualTo("recevierId", id)
+                val snapshot = query.get().await()
+                for (document in snapshot.documents){
+                    val channelRef = chRef.document(document.id)
+                    val updateDataImg = hashMapOf<String, Any>(
+                        "receiverProfileImg" to imgUrl
+                    )
+                    channelRef.update(updateDataImg).await()
+                }
+            }catch (e:Exception){
+                Log.e("EditProfileViewModel", "receiver ımg in chatCh: ${e.message}")
+            }
+        }
+    }
+
 }
 

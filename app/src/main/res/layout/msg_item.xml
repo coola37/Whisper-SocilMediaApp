@@ -39,15 +39,16 @@
 
         <TextView
             android:id="@+id/textViewMsg"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:paddingStart="0dp"
-            android:paddingEnd="6dp"
+            android:paddingEnd="10dp"
             android:paddingBottom="4dp"
             android:text="Sit quasi ipsa At architecto quas ut sint dolorem 33 vero nemo ut labore tempore ad repellat incidunt."
             android:textColor="@color/white"
             android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/msgUsername"
             app:layout_constraintTop_toBottomOf="@+id/msgUsername" />
 

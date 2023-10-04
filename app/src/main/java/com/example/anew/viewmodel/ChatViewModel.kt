@@ -3,9 +3,12 @@ package com.example.anew.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.anew.model.ChatChannel
 import com.example.anew.model.Messages
 import com.example.anew.model.Users
+import com.google.android.play.integrity.internal.c
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +24,7 @@ class ChatViewModel @Inject constructor(
 
     val senderUser: MutableLiveData<Users> = MutableLiveData()
     val receiverUser: MutableLiveData<Users> = MutableLiveData()
-    val msgData: MutableLiveData<List<Messages>> = MutableLiveData()
+    val msgData: MutableLiveData<ChatChannel> = MutableLiveData()
     val checkGetMessages: MutableLiveData<Boolean> = MutableLiveData()
 
     suspend fun fetchSenderUser(userId: String){
@@ -53,56 +56,79 @@ class ChatViewModel @Inject constructor(
     }
 
     suspend fun fetchMessages(senderId: String, receiverId: String){
-        val senderChannel = receiverId + senderId
-        val msgCollectionRef = db.collection("messages").document("channels")
-            .collection(senderChannel ?: "").orderBy("date")
+        val ch = senderId + receiverId
+        val msgCollectionRef = db.collection("chatChannels").document(ch)
         try {
             val querySnapshot = msgCollectionRef.get().await()
-            val msgList = mutableListOf<Messages>()
-            for(document in querySnapshot){
-                val msg = document.toObject(Messages::class.java)
-                msgList.add(msg)
+            querySnapshot?.let {documentSnapshot ->
+                val chatCh = documentSnapshot.toObject(ChatChannel::class.java)
+                msgData.postValue(chatCh!!)
             }
-            (msgData as MutableLiveData<List<Messages>>).postValue(msgList)
+
         }catch (e: java.lang.Exception){
             Log.e("fetchMessages", e.message.toString())
         }
-
     }
 
     suspend fun RefreshMessagesData(senderId: String, receiverId: String){
-        val senderChannel = receiverId + senderId
-        val receiverChannel = senderId + receiverId
-        val msgCollectionRef = db.collection("messages").document("channels")
-            .collection(senderChannel ?: "").orderBy("date")
+        val ch = senderId + receiverId
+        val msgCollectionRef = db.collection("chatChannels").document(ch)
         try {
             val querySnapshot = msgCollectionRef.get().await()
-            val msgList = mutableListOf<Messages>()
-            for(document in querySnapshot){
-                val msg = document.toObject(Messages::class.java)
-                msgList.add(msg)
+            querySnapshot?.let {documentSnapshot ->
+                val chatCh = documentSnapshot.toObject(ChatChannel::class.java)
+                msgData.postValue(chatCh!!)
             }
-            (msgData as MutableLiveData<List<Messages>>).postValue(msgList)
-            checkGetMessages.postValue(false)
+
         }catch (e: java.lang.Exception){
             Log.e("fetchMessages", e.message.toString())
         }
-
     }
 
 
-    suspend fun saveMsgToDb(msg: Messages) {
+     fun saveMsgToDb(msg: Messages) {
         val senderChannel = msg.recevierId + msg.senderId
         val receiverChannel = msg.senderId + msg.recevierId
 
         try {
-            db.collection("messages").document("channels")
-                .collection(senderChannel ?: "").document(msg.messageId ?: "").set(msg).await()
-            db.collection("messages").document("channels").collection(receiverChannel ?: "")
-                .document(msg.messageId ?: "").set(msg).await()
+            val msgRefSender = db.collection("chatChannels").document(senderChannel)
+            val msgRefReceiver = db.collection("chatChannels").document(receiverChannel)
+
+            val updateData = mapOf(
+                "messages" to FieldValue.arrayUnion(msg),
+                "lastMessage" to msg.msgText
+            )
+
+            msgRefSender.update(updateData).addOnSuccessListener {
+                Log.d("sendMsg", "ok")
+            }.addOnFailureListener {
+                Log.e("sendMsgError", it.message.toString())
+            }
+
+            msgRefReceiver.update(updateData).addOnSuccessListener {
+                Log.d("sendMsg", "ok")
+            }.addOnFailureListener {
+                Log.e("sendMsgError", it.message.toString())
+            }
             checkGetMessages.postValue(true)
         } catch (e: java.lang.Exception) {
             Log.e("Msg save to db error", e.message.toString())
         }
+    }
+
+
+    suspend fun firstMsg(chatSenderCh: ChatChannel, chatReceiverCh: ChatChannel, msg: Messages){
+        val senderCh = chatSenderCh.senderId + chatSenderCh.recevierId
+        val receiverCh = chatReceiverCh.senderId + chatReceiverCh.recevierId
+
+        try{
+            db.collection("chatChannels").document(senderCh).set(chatSenderCh).await()
+            db.collection("chatChannels").document(receiverCh).set(chatReceiverCh).await()
+        }catch (e: java.lang.Exception){
+            Log.e("InboxFragmentFirstMsg", e.message.toString())
+        }
+
+        saveMsgToDb(msg)
+        checkGetMessages.postValue(true)
     }
 }

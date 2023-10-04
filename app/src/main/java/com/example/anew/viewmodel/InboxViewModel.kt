@@ -3,11 +3,13 @@ package com.example.anew.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.anew.model.ChatChannel
 import com.example.anew.model.Messages
 import com.example.anew.model.Posts
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -21,7 +23,7 @@ class InboxViewModel @Inject constructor(
 ) : BaseViewModel(application){
 
     val userData: MutableLiveData<Users> = MutableLiveData()
-    val messages: MutableLiveData<List<Messages>> = MutableLiveData()
+    val chatChannels: MutableLiveData<List<ChatChannel>> = MutableLiveData()
     val chatUsers: MutableLiveData<List<Users>> = MutableLiveData()
 
     suspend fun fetchUserData(userId: String){
@@ -38,28 +40,20 @@ class InboxViewModel @Inject constructor(
             }
     }
 
-    suspend fun getChatUsers(senderIdList: List<String>) {
-        val chatUsersCollectionRef = db.collection("users")
-        try {
-            val userList = mutableListOf<Users>()
+   suspend fun fetchChatChannels(userId: String){
+       val chatChannelDocRef = db.collection("chatChannels")
+       try {
+           val querySnapshot = chatChannelDocRef.whereEqualTo("senderId", userId).get().await()
 
-            for (senderId in senderIdList) {
-                Log.e("senderID", senderId)
-                val querySnapshot = chatUsersCollectionRef
-                    .whereEqualTo("senderID", senderId)
-                    .get()
-                    .await()
-
-                for (document in querySnapshot) {
-                    val users = document.toObject(Users::class.java)
-                    userList.add(users)
-                }
-            }
-
-            (chatUsers as MutableLiveData<List<Users>>).postValue(userList)
-        } catch (e: Exception) {
-            Log.e("InboxViewModel", "Error chat users: ${e.message}")
-        }
-    }
+           val chatChannelList = mutableListOf<ChatChannel>()
+           for(document in querySnapshot){
+               val channel = document.toObject(ChatChannel::class.java)
+               chatChannelList.add(channel)
+           }
+           (chatChannels as MutableLiveData<List<ChatChannel>>).postValue(chatChannelList)
+       }catch (e: Exception){
+           Log.e("InboxFragmentFetchChats", e.message.toString())
+       }
+   }
 
 }

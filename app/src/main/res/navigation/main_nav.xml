@@ -94,6 +94,9 @@
         <action
             android:id="@+id/action_chatFragment_to_inboxFragment"
             app:destination="@id/inboxFragment" />
+        <action
+            android:id="@+id/action_chatFragment_to_profileViewerFragment"
+            app:destination="@id/profileViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/homeFollowersFragment"
