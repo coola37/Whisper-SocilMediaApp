@@ -5,6 +5,8 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.anew.model.ChatChannel
+import com.example.anew.model.Messages
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,8 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
+import kotlin.Exception
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
@@ -141,5 +143,57 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
+    fun updateProfileImgSenderChInChat(userId: String, imgUrl: String){
+        launch {
+            val query = db.collection("chatChannels").whereEqualTo("senderId", userId)
+
+            query.get().addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val chatChannel = document.toObject(ChatChannel::class.java)
+
+                    // messages listesini güncelle
+                    chatChannel.messages?.forEach { message ->
+                        if (message.senderId == userId) { // Güncellemek istediğiniz ID ile eşleşiyorsa
+                            // message içindeki senderProfileImg değişkenini güncelle
+                            message.senderProfileImg = imgUrl // Yeni profil resmi URL'sini burada ayarlayın
+                        }
+                    }
+
+                    // Güncellenmiş chatChannel'i Firestore'a geri yaz
+                    document.reference.set(chatChannel)
+                }
+            }.addOnFailureListener { exception ->
+                Log.e("updateProfileImgSenderChInChatError", exception.message.toString())
+            }
+        }
+    }
+
+    fun updateProfileImgRecevierChInChat(userId: String, imgUrl: String){
+        launch {
+            val query = db.collection("chatChannels").whereEqualTo("recevierId", userId)
+
+            query.get().addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val chatChannel = document.toObject(ChatChannel::class.java)
+
+                    // messages listesini güncelle
+                    chatChannel.messages?.forEach { message ->
+                        if (message.senderId == userId) { // Güncellemek istediğiniz ID ile eşleşiyorsa
+                            // message içindeki senderProfileImg değişkenini güncelle
+                            message.senderProfileImg = imgUrl // Yeni profil resmi URL'sini burada ayarlayın
+                        }
+                    }
+
+                    // Güncellenmiş chatChannel'i Firestore'a geri yaz
+                    document.reference.set(chatChannel)
+                }
+            }.addOnFailureListener { exception ->
+                Log.e("updateProfileImgSenderChInChatError", exception.message.toString())
+            }
+        }
+    }
 }
+
+
+
 

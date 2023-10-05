@@ -69,6 +69,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     viewModel.updateProfileData(auth.currentUser!!.uid, name, bio, imageUrl)
                     viewModel.updateSenderImgInPosts(auth.currentUser!!.uid, imageUrl, name)
                     viewModel.updateImgInChatChannel(auth.uid!!, imageUrl)
+                    viewModel.updateProfileImgSenderChInChat(auth.uid!!, imageUrl)
+                    viewModel.updateProfileImgRecevierChInChat(auth.uid!!, imageUrl)
                     Log.e("imageUrl", imageUrl)
                     findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
                 }
