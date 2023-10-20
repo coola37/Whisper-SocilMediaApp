@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notification_nav"
+    app:startDestination="@id/notificationsFragment">
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.anew.view.NotificationsFragment"
+        android:label="fragment_notifications"
+        tools:layout="@layout/fragment_notifications" >
+        <action
+            android:id="@+id/action_notificationsFragment_to_postViewerFragment2"
+            app:destination="@id/postViewerFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/postViewerFragment2"
+        android:name="com.example.anew.view.PostViewerFragment"
+        android:label="fragment_post_viewer"
+        tools:layout="@layout/fragment_post_viewer" >
+        <action
+            android:id="@+id/action_postViewerFragment2_to_notificationsFragment"
+            app:destination="@id/notificationsFragment" />
+    </fragment>
+</navigation>

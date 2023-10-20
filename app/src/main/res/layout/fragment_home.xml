@@ -25,9 +25,9 @@
             tools:layout_editor_absoluteY="3dp">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="100dp"
+                android:layout_width="150dp"
                 android:layout_height="50dp"
-                android:src="@drawable/newlogo"
+                android:src="@drawable/whisper_text_logo"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -106,39 +106,16 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewEveryone" />
 
 
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/homeRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        tools:listitem="@layout/home_item"
-        app:layout_constraintBottom_toTopOf="@+id/view3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view2" />
-
-
-    <View
-        android:id="@+id/view3"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/side"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:itemBackground="@color/black"
-        app:itemIconTint="@color/white"
-        app:itemRippleColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bot_menu" />
+        app:layout_constraintTop_toBottomOf="@+id/view2"
+        tools:listitem="@layout/home_item" />
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/buttonAddPost"
@@ -149,7 +126,7 @@
         android:clickable="true"
         android:src="@drawable/ic_action_add"
         app:backgroundTint="#3B8BE1"
-        app:layout_constraintBottom_toBottomOf="@+id/homeRecycler"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 

@@ -66,7 +66,7 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
         }
 
         binding.imageViewSendMsg.setOnClickListener {
-            findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment, bundleOf("senderId" to senderId))
+            findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2, bundleOf("senderId" to senderId))
         }
 
         CoroutineScope(Dispatchers.Main).launch{

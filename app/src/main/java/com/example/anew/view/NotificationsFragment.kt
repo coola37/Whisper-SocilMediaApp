@@ -41,10 +41,9 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentNotificationsBinding.bind(view)
         viewModel = ViewModelProvider(this)[NotificationsViewModel::class.java]
-        setupBottomNavigationView()
         adapter = NotificationAdapter(emptyList(), object : OnClickListenerCatchData{
             override fun onProfileImageClick(senderId: String) {
-                findNavController().navigate(R.id.action_notificationsFragment_to_postViewerFragment,
+                findNavController().navigate(R.id.action_notificationsFragment_to_postViewerFragment2,
                 bundleOf("postID" to senderId)
                 )
             }
@@ -62,31 +61,5 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
         }
     }
 
-    private fun setupBottomNavigationView(){
-        binding.bottomNavigationView.setOnNavigationItemReselectedListener {
 
-            when(it.itemId){
-
-                R.id.ic_action_search -> {
-                    Log.e("search","click")
-                    findNavController().navigate(R.id.action_notificationsFragment_to_searchFragment)
-                    false
-                }
-                R.id.ic_action_home -> {
-                    Log.e("notification","click")
-                    findNavController().navigate(R.id.action_notificationsFragment_to_homeFragment)
-                    false
-                }
-                R.id.ic_action_inbox -> {
-                    Log.e("inbox","click")
-                    findNavController().navigate(R.id.action_notificationsFragment_to_inboxFragment)
-                    false
-                }
-
-                else -> false
-            }
-        }
-        val menuItem = binding.bottomNavigationView.menu.getItem(0)
-        menuItem.isChecked = true
-    }
 }

@@ -10,22 +10,25 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@mipmap/ic_logo_whisper"
+        android:label="Whisper"
         android:supportsRtl="true"
         android:theme="@style/Theme.New"
         tools:targetApi="31">
         <activity
-            android:name=".ProfileActivity"
+            android:name=".view.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".InboxActivity"
+            android:name=".view.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".NotificationActivity"
+            android:name=".view.InboxActivity"
             android:exported="false" />
         <activity
-            android:name=".SearchActivity"
+            android:name=".view.NotificationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".view.RegisterActivity"

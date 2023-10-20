@@ -1,5 +1,6 @@
 package com.example.anew.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -45,7 +46,6 @@ class HomeFollowersFragment : Fragment(R.layout.fragment_home_followers) {
         binding = FragmentHomeFollowersBinding.bind(view)
         viewModel = ViewModelProvider(this)[HomeFollowersViewModel::class.java]
 
-        setupBottomNavigationView()
         setupButtonClick()
 
        auth.currentUser?.let {
@@ -70,7 +70,8 @@ class HomeFollowersFragment : Fragment(R.layout.fragment_home_followers) {
            adapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData {
                override fun onProfileImageClick(senderId: String) {
                    if(senderId == auth.uid){
-                       findNavController().navigate(R.id.action_homeFragment_to_profileFragment)
+                       val intent = Intent(requireContext(), ProfileActivity::class.java)
+                       startActivity(intent)
                    }else{
                        findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
                            bundleOf("senderId" to senderId)
@@ -119,37 +120,12 @@ class HomeFollowersFragment : Fragment(R.layout.fragment_home_followers) {
         }
     }
 
-    private fun setupBottomNavigationView(){
-        binding.bottomNavigationView.setOnNavigationItemReselectedListener {
 
-            when(it.itemId){
-
-                R.id.ic_action_search -> {
-                    Log.e("search","click")
-                    findNavController().navigate(R.id.action_homeFollowersFragment_to_searchFragment)
-                    false
-                }
-                R.id.ic_action_notification -> {
-                    Log.e("notification","click")
-                    findNavController().navigate(R.id.action_homeFollowersFragment_to_notificationsFragment)
-                    false
-                }
-                R.id.ic_action_inbox -> {
-                    Log.e("inbox","click")
-                    findNavController().navigate(R.id.action_homeFollowersFragment_to_inboxFragment)
-                    false
-                }
-
-                else -> false
-            }
-        }
-        val menuItem = binding.bottomNavigationView.menu.getItem(0)
-        menuItem.isChecked = true
-    }
 
     private fun setupButtonClick(){
         binding.circleImage.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFollowersFragment_to_profileFragment)
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
         }
         binding.buttonAddPost.setOnClickListener {
             findNavController().navigate(R.id.action_homeFollowersFragment_to_shareFragment)

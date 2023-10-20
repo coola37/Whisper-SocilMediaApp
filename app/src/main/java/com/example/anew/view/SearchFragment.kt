@@ -62,12 +62,11 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 }
 
             })
-            setupBottomNavigationView()
             adapter = UsersAdapter(emptyList(), object : OnClickListenerCatchData{
                 override fun onProfileImageClick(senderId: String) {
                     val fragment = ProfileViewerFragment.newInstance(senderId)
                     Log.e("senderId SearchFragmentToViewerFragment", senderId)
-                    findNavController().navigate(R.id.action_searchFragment_to_profileViewerFragment, bundleOf("senderId" to senderId))
+                    findNavController().navigate(R.id.action_searchFragment_to_profileViewerFragment2, bundleOf("senderId" to senderId))
                 }
 
             })
@@ -97,31 +96,5 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
 
     }
-    private fun setupBottomNavigationView(){
-        binding.bottomNavigationView2.setOnNavigationItemReselectedListener {
 
-            when(it.itemId){
-
-                R.id.ic_action_home -> {
-                    Log.e("search","click")
-                    findNavController().navigate(R.id.action_searchFragment_to_homeFragment)
-                    false
-                }
-                R.id.ic_action_notification -> {
-                    Log.e("notification","click")
-                    findNavController().navigate(R.id.action_searchFragment_to_notificationsFragment)
-                    false
-                }
-                R.id.ic_action_inbox -> {
-                    Log.e("inbox","click")
-                    findNavController().navigate(R.id.action_searchFragment_to_inboxFragment)
-                    false
-                }
-
-                else -> false
-            }
-        }
-        val menuItem = binding.bottomNavigationView2.menu.getItem(0)
-        menuItem.isChecked = true
-    }
 }

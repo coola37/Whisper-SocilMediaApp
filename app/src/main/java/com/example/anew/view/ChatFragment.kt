@@ -149,7 +149,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private fun setupButtons(){
         binding.receiverProfileImg.setOnClickListener {
-            findNavController().navigate(R.id.action_chatFragment_to_profileViewerFragment,
+            findNavController().navigate(R.id.action_chatFragment_to_profileViewerFragment3,
             bundleOf("senderId" to receiverId)
             )
         }

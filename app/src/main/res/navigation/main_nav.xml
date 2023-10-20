@@ -11,18 +11,6 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/action_homeFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_inboxFragment"
-            app:destination="@id/inboxFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-        <action
             android:id="@+id/action_homeFragment_to_shareFragment"
             app:destination="@id/shareFragment" />
         <action
@@ -36,72 +24,6 @@
             app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
-        android:id="@+id/searchFragment"
-        android:name="com.example.anew.view.SearchFragment"
-        android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
-        <action
-            android:id="@+id/action_searchFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
-        <action
-            android:id="@+id/action_searchFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_searchFragment_to_inboxFragment"
-            app:destination="@id/inboxFragment" />
-        <action
-            android:id="@+id/action_searchFragment_to_profileViewerFragment"
-            app:destination="@id/profileViewerFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/notificationsFragment"
-        android:name="com.example.anew.view.NotificationsFragment"
-        android:label="fragment_notifications"
-        tools:layout="@layout/fragment_notifications" >
-        <action
-            android:id="@+id/action_notificationsFragment_to_inboxFragment"
-            app:destination="@id/inboxFragment" />
-        <action
-            android:id="@+id/action_notificationsFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_notificationsFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_notificationsFragment_to_postViewerFragment"
-            app:destination="@id/postViewerFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/inboxFragment"
-        android:name="com.example.anew.view.InboxFragment"
-        android:label="fragment_inbox"
-        tools:layout="@layout/fragment_inbox" >
-        <action
-            android:id="@+id/action_inboxFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
-        <action
-            android:id="@+id/action_inboxFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_inboxFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_inboxFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/chatFragment"
-        android:name="com.example.anew.view.ChatFragment"
-        android:label="fragment_chat"
-        tools:layout="@layout/fragment_chat" >
-        <action
-            android:id="@+id/action_chatFragment_to_inboxFragment"
-            app:destination="@id/inboxFragment" />
-        <action
-            android:id="@+id/action_chatFragment_to_profileViewerFragment"
-            app:destination="@id/profileViewerFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/homeFollowersFragment"
         android:name="com.example.anew.view.HomeFollowersFragment"
         android:label="fragment_home_followers"
@@ -110,50 +32,11 @@
             android:id="@+id/action_homeFollowersFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
         <action
-            android:id="@+id/action_homeFollowersFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_homeFollowersFragment_to_notificationsFragment"
-            app:destination="@id/notificationsFragment" />
-        <action
-            android:id="@+id/action_homeFollowersFragment_to_inboxFragment"
-            app:destination="@id/inboxFragment" />
-        <action
-            android:id="@+id/action_homeFollowersFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-        <action
             android:id="@+id/action_homeFollowersFragment_to_shareFragment"
             app:destination="@id/shareFragment" />
         <action
             android:id="@+id/action_homeFollowersFragment_to_profileViewerFragment"
             app:destination="@id/profileViewerFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.anew.view.ProfileFragment"
-        android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
-        <action
-            android:id="@+id/action_profileFragment_to_homeFollowersFragment"
-            app:destination="@id/homeFollowersFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_editProfileFragment"
-            app:destination="@id/editProfileFragment" />
-        <action
-            android:id="@+id/action_profileFragment_to_postViewerFragment"
-            app:destination="@id/postViewerFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/editProfileFragment"
-        android:name="com.example.anew.view.EditProfileFragment"
-        android:label="fragment_edit_profile"
-        tools:layout="@layout/fragment_edit_profile" >
-        <action
-            android:id="@+id/action_editProfileFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
     </fragment>
     <fragment
         android:id="@+id/shareFragment"
@@ -178,18 +61,15 @@
         <action
             android:id="@+id/action_profileViewerFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_profileViewerFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
         <argument
             android:name="senderId"
             app:argType="string" />
         <action
-            android:id="@+id/action_profileViewerFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
-        <action
             android:id="@+id/action_profileViewerFragment_to_postViewerFragment"
             app:destination="@id/postViewerFragment" />
+        <action
+            android:id="@+id/action_profileViewerFragment_to_chatFragment2"
+            app:destination="@id/chatFragment2" />
     </fragment>
     <fragment
         android:id="@+id/postViewerFragment"
@@ -202,8 +82,14 @@
         <action
             android:id="@+id/action_postViewerFragment_to_profileViewerFragment"
             app:destination="@id/profileViewerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment2"
+        android:name="com.example.anew.view.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
         <action
-            android:id="@+id/action_postViewerFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
+            android:id="@+id/action_chatFragment2_to_profileViewerFragment"
+            app:destination="@id/profileViewerFragment" />
     </fragment>
 </navigation>

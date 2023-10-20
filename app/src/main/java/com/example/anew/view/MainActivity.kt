@@ -9,7 +9,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.example.anew.R
+import com.example.anew.utils.BottomNavigationViewHelper
 import com.example.anew.utils.NetworkConnection
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -25,13 +27,15 @@ class MainActivity : AppCompatActivity() {
     @Inject
     internal lateinit var auth: FirebaseAuth
     private lateinit var authListener: FirebaseAuth.AuthStateListener
+    private lateinit var bottomNavigationView: BottomNavigationView
+    private val ACTIVITY_NO = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        bottomNavigationView = findViewById(R.id.bottomNavigationView3)
         setupAuthListener()
         networkCheck()
-
+        setupNavigationView()
     }
 
     override fun onStart() {
@@ -51,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch{
             networkConnection.observe(this@MainActivity, Observer{ isConnected->
                 if(isConnected){
-                    Toast.makeText(this@MainActivity,"Welcome To Pokemon List",Toast.LENGTH_LONG).show()
                     Log.d("Network Check", "OK")
                 }
 
@@ -83,4 +86,11 @@ class MainActivity : AppCompatActivity() {
            }
        }
    }
+
+    private fun setupNavigationView() {
+        BottomNavigationViewHelper.setupNavigation(this, bottomNavigationView)
+        val menu = bottomNavigationView.menu
+        val menuItem = menu.getItem(ACTIVITY_NO)
+        menuItem.isChecked = true
+    }
 }

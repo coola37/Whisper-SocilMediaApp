@@ -72,11 +72,14 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     viewModel.updateProfileImgSenderChInChat(auth.uid!!, imageUrl)
                     viewModel.updateProfileImgRecevierChInChat(auth.uid!!, imageUrl)
                     Log.e("imageUrl", imageUrl)
+                    this@EditProfileFragment.onDestroy()
                     findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
+
                 }
             }else{
                 viewModel.updateProfileData(auth.currentUser!!.uid, name, bio, profileUrl)
                 viewModel.updateSenderImgInPosts(auth.currentUser!!.uid, profileUrl, name)
+                this@EditProfileFragment.onDestroy()
                 findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
             }
         }
