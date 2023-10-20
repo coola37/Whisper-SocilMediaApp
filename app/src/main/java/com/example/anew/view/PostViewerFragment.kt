@@ -102,11 +102,13 @@ class PostViewerFragment : Fragment(R.layout.fragment_post_viewer) {
         CoroutineScope(Dispatchers.IO).launch { viewModel.checkLike(postID) }
         viewModel.checkLike.observe(viewLifecycleOwner){
             if(it){
-                viewModel.disLike(postID)
-                CoroutineScope(Dispatchers.Main).launch{ viewModel.refreshPostData(postID) }
+                CoroutineScope(Dispatchers.Main).launch{
+                    viewModel.disLike(postID)
+                    viewModel.refreshPostData(postID) }
             }else{
-                viewModel.like(postID)
-                CoroutineScope(Dispatchers.Main).launch{ viewModel.refreshPostData(postID) }
+                CoroutineScope(Dispatchers.Main).launch{
+                    viewModel.like(postID)
+                    viewModel.refreshPostData(postID) }
             }
         }
     }

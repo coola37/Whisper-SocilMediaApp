@@ -67,6 +67,9 @@
         <action
             android:id="@+id/action_notificationsFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_notificationsFragment_to_postViewerFragment"
+            app:destination="@id/postViewerFragment" />
     </fragment>
     <fragment
         android:id="@+id/inboxFragment"

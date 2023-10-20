@@ -23,10 +23,6 @@ import javax.inject.Inject
     val checkUserUpdate: MutableLiveData<Boolean> = MutableLiveData()
     val buttonCheck: MutableLiveData<Boolean> = MutableLiveData()
 
-
-
-
-
     suspend fun fetchUserData(userId: String){
         val userDocRef = db.collection("users").document(userId)
         try {

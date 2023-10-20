@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.anew.model.Comments
+import com.example.anew.model.Notifications
 import com.example.anew.model.Posts
 import com.example.anew.model.Users
 import com.google.firebase.auth.FirebaseAuth
@@ -12,7 +13,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class PostViewerViewModel @Inject constructor(
@@ -48,8 +51,6 @@ class PostViewerViewModel @Inject constructor(
         val commentsCollectionRef = db.collection("comments")
         try {
             val querySnapshot = commentsCollectionRef.whereEqualTo("postID", postId).get().await()
-
-
             val commentsList = mutableListOf<Comments>()
             for (document in querySnapshot){
                 val comment = document.toObject(Comments::class.java)
@@ -60,19 +61,6 @@ class PostViewerViewModel @Inject constructor(
             Log.e("PostViewerVM fetchComments", e.message.toString())
         }
     }
-    suspend fun fetchPostData(postId: String){
-        val postsCollectionRef = db.collection("posts").document(postId)
-        try {
-            val snapshot = postsCollectionRef.get().await()
-            snapshot?.let {
-                val post = it.toObject(Posts::class.java)
-                postsData.postValue(post!!)
-            }
-        }catch (e: Exception){
-            Log.e("PostViewerViewModel_fetchPostData", e.message.toString())
-        }
-    }
-
 
     suspend fun fetchCommentsData(postId: String){
         val commentsCollectionRef = db.collection("comments")
@@ -171,7 +159,6 @@ class PostViewerViewModel @Inject constructor(
         val userId = auth.uid
         auth.currentUser?.let {
             val postRef = db.collection("posts").document(postId)
-
             postRef.update(
                 "likeUsers", FieldValue.arrayUnion(userId),
                 "like", FieldValue.increment(1)
@@ -201,13 +188,38 @@ class PostViewerViewModel @Inject constructor(
         }
     }
 
+    suspend fun fetchPostData(postId: String){
+        val postsCollectionRef = db.collection("posts").document(postId)
+        try {
+            val snapshot = postsCollectionRef.get().await()
+            snapshot?.let {
+                val post = it.toObject(Posts::class.java)
+                postsData.postValue(post!!)
+            }
+        }catch (e: Exception){
+            Log.e("PostViewerViewModel_fetchPostData", e.message.toString())
+        }
+    }
     suspend fun saveCommentToDb(comments: Comments){
         try {
             db.collection("comments").document(comments.commentsID ?: "").set(comments).await()
+            val postRef = db.collection("posts").document(comments.postID!!)
+            try {
+                val snapshot = postRef.get().await()
+                snapshot?.let {
+                    val post = it.toObject(Posts::class.java)
+                    val id = UUID.randomUUID().toString()
+                    val notification = Notifications(post?.senderID,
+                        "Comment", "${comments.senderUsername} commented on your post.",
+                        post?.postID, comments.commentsID, comments.senderProfileImg , comments.senderUsername)
+                    db.collection("notifications").document(id ?: "").set(notification).await()
+                }
+            }catch (e:Exception){
+                Log.e("sendNotification", e.message.toString())
+            }
+
         } catch (e: java.lang.Exception) {
             Log.e("SaveCommentsDb", e.message.toString())
         }
     }
-
-
 }

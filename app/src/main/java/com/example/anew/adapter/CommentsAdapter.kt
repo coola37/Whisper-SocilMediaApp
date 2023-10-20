@@ -19,12 +19,9 @@ class CommentsAdapter(
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val commentsProfileImg : ImageView = itemView.findViewById(R.id.commentsProfileImg)
         val imageViewLikeComments : ImageView = itemView.findViewById(R.id.imageViewLikeComments)
-
         val textViewCommentsUsername : TextView = itemView.findViewById(R.id.textViewCommentsUsername)
         val commentText : TextView = itemView.findViewById(R.id.commentText)
         val textViewLikeCountComments : TextView = itemView.findViewById(R.id.textViewLikeCountComments)
-
-
     }
 
 
