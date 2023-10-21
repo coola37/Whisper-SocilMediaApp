@@ -1,5 +1,6 @@
 package com.example.anew.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -98,11 +99,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun setupButtons(){
-        binding.textViewSignOut.setOnClickListener {
-            auth.signOut()
-        }
         binding.buttonEditProfile.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+        }
+        binding.imageViewSettings.setOnClickListener {
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            startActivity(intent)
         }
     }
 
