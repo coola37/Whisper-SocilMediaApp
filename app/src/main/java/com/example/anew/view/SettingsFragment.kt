@@ -47,5 +47,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.textViewChangePassword.setOnClickListener {
             findNavController().navigate(R.id.action_settingsFragment_to_changePasswordFragment)
         }
+        binding.textViewSettingsSignOut.setOnClickListener {
+            auth.signOut()
+        }
     }
 }

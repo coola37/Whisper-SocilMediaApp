@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import com.example.anew.R
 import com.example.anew.databinding.FragmentChangeEmailBinding
 import com.google.firebase.auth.EmailAuthProvider
@@ -29,6 +30,9 @@ class ChangeEmailFragment : Fragment(R.layout.fragment_change_email) {
 
         binding.buttonChangePassword.setOnClickListener {
             changeEmail()
+        }
+        binding.imageVirwBack.setOnClickListener {
+            findNavController().navigate(R.id.action_changeEmailFragment_to_settingsFragment)
         }
     }
 

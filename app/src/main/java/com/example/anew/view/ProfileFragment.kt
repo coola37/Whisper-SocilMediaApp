@@ -91,7 +91,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
             glide.load(user.details?.profileImg)
                 .placeholder(R.mipmap.ic_none_img)
-                .error(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_none_img)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .into(binding.circleImageView)

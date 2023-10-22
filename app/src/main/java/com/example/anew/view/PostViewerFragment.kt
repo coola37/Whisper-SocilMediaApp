@@ -23,6 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
@@ -179,17 +181,32 @@ class PostViewerFragment : Fragment(R.layout.fragment_post_viewer) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 viewModel.saveCommentToDb(comments)
+                checkUpdateComments()
             }catch (e: Exception){
                 Log.e("sendComment", e.message.toString())
             }
         }
     }
 
+    private fun checkUpdateComments(){
+            viewModel.checkUpdate.observe(viewLifecycleOwner){
+                if(it){
+                    CoroutineScope(Dispatchers.Main).launch{
+                        viewModel.refreshCommentsData(postID)
+                    }
+                }else{
+                    Log.d("CheckUpdateComments", "Comments is currency")
+                }
+            }
+
+    }
+
     private fun setupButtonClick(){
         binding.buttonAddComment.setOnClickListener {
             val commentId = UUID.randomUUID().toString()
             val commentText = binding.editTextComments.text.toString()
-            val comments = Comments(commentId, auth.uid, postID, username, senderProfileImg, 0, emptyList(), commentText)
+            val date = SimpleDateFormat("dd/M/yyyy hh:mm").format(Date())
+            val comments = Comments(commentId, auth.uid, postID, username, senderProfileImg, 0, emptyList(), commentText, date)
             sendComment(comments)
             binding.editTextComments.text.clear()
         }

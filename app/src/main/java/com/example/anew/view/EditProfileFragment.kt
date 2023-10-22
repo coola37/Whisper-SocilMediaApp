@@ -117,7 +117,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
             glide.load(it.details?.profileImg)
                 .placeholder(R.mipmap.ic_none_img)
-                .error(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_none_img)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .into(binding.profileImg)

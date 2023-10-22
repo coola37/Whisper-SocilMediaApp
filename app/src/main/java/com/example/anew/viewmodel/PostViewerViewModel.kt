@@ -32,6 +32,7 @@ class PostViewerViewModel @Inject constructor(
     val checkLikeForComments: MutableLiveData<Boolean> = MutableLiveData()
     val checkUpdateComments: MutableLiveData<Boolean> = MutableLiveData()
 
+
     suspend fun refreshPostData(postId: String){
         val postsCollectionRef = db.collection("posts").document(postId)
         try {
@@ -203,6 +204,7 @@ class PostViewerViewModel @Inject constructor(
     suspend fun saveCommentToDb(comments: Comments){
         try {
             db.collection("comments").document(comments.commentsID ?: "").set(comments).await()
+            checkUpdate.postValue(true)
             val postRef = db.collection("posts").document(comments.postID!!)
             try {
                 val snapshot = postRef.get().await()

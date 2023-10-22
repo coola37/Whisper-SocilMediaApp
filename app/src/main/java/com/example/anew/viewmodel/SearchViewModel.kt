@@ -53,7 +53,11 @@ class SearchViewModel @Inject constructor(
             val usersList = mutableListOf<Users>()
             for (document in querySnapshot){
                 val user = document.toObject(Users::class.java)
-                usersList.add(user)
+                if(user.userId != auth.uid){
+                    usersList.add(user)
+                }else{
+                    Log.d("searchViewModel", "Current User")
+                }
             }
             (usersData as MutableLiveData<List<Users>>).postValue(usersList)
             usersNameMap.clear()

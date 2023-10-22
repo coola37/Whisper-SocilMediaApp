@@ -15,6 +15,7 @@ import com.example.anew.R
 import com.example.anew.adapter.HomePostsAdapter
 import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.databinding.FragmentProfileViewerBinding
+import com.example.anew.viewmodel.PostViewerViewModel
 import com.example.anew.viewmodel.ProfileViewerViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -48,6 +49,7 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
     private lateinit var binding : FragmentProfileViewerBinding
     private lateinit var adapter: HomePostsAdapter
     private lateinit var senderId : String
+    private lateinit var checkNavViewmodel: ProfileViewerViewModel
 
 
 
@@ -55,6 +57,9 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentProfileViewerBinding.bind(view)
         viewModel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
+        checkNavViewmodel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
+        checkNavViewmodel.inMainNav.postValue(true)
+        checkNavViewmodel.inSearchNav.postValue(false)
 
         senderId = requireArguments().getString("senderId").toString()
 
@@ -66,7 +71,19 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
         }
 
         binding.imageViewSendMsg.setOnClickListener {
-            findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2, bundleOf("senderId" to senderId))
+           /* if(){
+                findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2, bundleOf("senderId" to senderId))
+            }
+            else{
+                findNavController().navigate(R.id.action_profileViewerFragment2_to_chatFragment3)
+            }*/
+            checkNavViewmodel.inMainNav.observe(viewLifecycleOwner){
+                if (it){
+                    findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2, bundleOf("senderId" to senderId))
+                }else{
+
+                }
+            }
         }
 
         CoroutineScope(Dispatchers.Main).launch{

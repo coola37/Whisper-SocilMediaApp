@@ -21,5 +21,17 @@
         <action
             android:id="@+id/action_profileViewerFragment2_to_searchFragment"
             app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_profileViewerFragment2_to_chatFragment3"
+            app:destination="@id/chatFragment3" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment3"
+        android:name="com.example.anew.view.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
+        <action
+            android:id="@+id/action_chatFragment3_to_profileViewerFragment2"
+            app:destination="@id/profileViewerFragment2" />
     </fragment>
 </navigation>

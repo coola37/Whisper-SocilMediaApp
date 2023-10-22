@@ -8,7 +8,8 @@ data class Comments (
     var senderProfileImg: String? = null,
     var likeCounts: Int? = 0,
     var likeUsers: List<String> = emptyList(),
-    var commentsText: String? = null
+    var commentsText: String? = null,
+    var date: String? = null
 ) {
-    constructor() : this(null, null, null, null, null, 0, emptyList(), null)
+    constructor() : this(null, null, null, null, null, 0, emptyList(), null, null)
 }

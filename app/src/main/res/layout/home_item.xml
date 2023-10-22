@@ -49,7 +49,7 @@
             android:id="@+id/imagePostProfil"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:src="@mipmap/ic_none_img"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textViewUsername" />
 

@@ -22,6 +22,8 @@ import javax.inject.Inject
     val checkFollowing: MutableLiveData<Boolean> = MutableLiveData()
     val checkUserUpdate: MutableLiveData<Boolean> = MutableLiveData()
     val buttonCheck: MutableLiveData<Boolean> = MutableLiveData()
+    val inMainNav: MutableLiveData<Boolean> = MutableLiveData()
+    val inSearchNav: MutableLiveData<Boolean> = MutableLiveData()
 
     suspend fun fetchUserData(userId: String){
         val userDocRef = db.collection("users").document(userId)

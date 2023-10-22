@@ -1,5 +1,6 @@
 package com.example.anew.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -83,20 +84,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
         }
 
-        binding.buttonSendMsg.setOnClickListener {
-           CoroutineScope(Dispatchers.Main).launch {
-               sendMessage()
-               binding.editTextTextMsg.text.clear()
 
-               viewModel.checkGetMessages.observe(viewLifecycleOwner){
-                   if (it){
-                       CoroutineScope(Dispatchers.Main).launch { viewModel.RefreshMessagesData(auth.uid.toString(), receiverId) }
-                   }else{
-                       Log.d("Chat Data", "chat data is currency")
-                   }
-               }
-           }
-        }
         setupButtons()
     }
 
@@ -154,7 +142,22 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             )
         }
         binding.backImg.setOnClickListener {
-            findNavController().navigate(R.id.action_chatFragment_to_inboxFragment)
+            val intent = Intent(requireActivity(), InboxActivity::class.java)
+            startActivity(intent)
+        }
+        binding.buttonSendMsg.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                sendMessage()
+                binding.editTextTextMsg.text.clear()
+
+                viewModel.checkGetMessages.observe(viewLifecycleOwner){
+                    if (it){
+                        CoroutineScope(Dispatchers.Main).launch { viewModel.RefreshMessagesData(auth.uid.toString(), receiverId) }
+                    }else{
+                        Log.d("Chat Data", "chat data is currency")
+                    }
+                }
+            }
         }
     }
 

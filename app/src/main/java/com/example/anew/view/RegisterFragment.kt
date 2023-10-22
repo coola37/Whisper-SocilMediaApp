@@ -1,61 +1,50 @@
 package com.example.anew.view
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import com.example.anew.R
+import com.example.anew.databinding.FragmentRegisterBinding
 import com.example.anew.model.UserDetails
 import com.example.anew.model.Users
-import com.google.firebase.auth.*
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegisterActivity : AppCompatActivity() {
-
-    private lateinit var editTextUserame: EditText
-    private lateinit var editTextEmail: EditText
-    private lateinit var editTextPassword: EditText
-    private lateinit var buttonRegister: Button
+class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     @Inject
     internal lateinit var auth: FirebaseAuth
     @Inject
     internal lateinit var db: FirebaseFirestore
+    private lateinit var binding: FragmentRegisterBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
-
-        initializeViews()
-
-        buttonRegister.setOnClickListener {
-            GlobalScope.launch(Dispatchers.Main) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentRegisterBinding.bind(view)
+        binding.buttonRegister.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                binding.progressBarRegister.visibility = View.VISIBLE
                 performRegister()
             }
         }
     }
 
-    private fun initializeViews() {
-        editTextUserame = findViewById(R.id.editTextUsername)
-        editTextEmail = findViewById(R.id.editTextEmail)
-        editTextPassword = findViewById(R.id.editTextTextPassword2)
-        buttonRegister = findViewById(R.id.buttonRegister)
-    }
-
     private suspend fun performRegister() {
-        val email = editTextEmail.text.toString()
-        val username = "@${editTextUserame.text.toString()}"
-        val password = editTextPassword.text.toString()
+        val email = binding.editTextEmail.text.toString()
+        val username = "@${binding.editTextUsername.text}"
+        val password = binding.editTextTextPassword2.text.toString()
 
         try {
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
@@ -64,17 +53,19 @@ class RegisterActivity : AppCompatActivity() {
             saveDb(authResult.user?.uid.toString(), username, email)
 
             Toast.makeText(
-                this,
+                requireActivity(),
                 "You can log in after verifying your account with the link sent to your e-mail address.",
                 Toast.LENGTH_SHORT
             ).show()
 
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(requireActivity(), LoginActivity::class.java)
+            binding.progressBarRegister.visibility = View.GONE
             startActivity(intent)
-            finish()
+            requireActivity().finish()
 
         } catch (e: Exception) {
-            Toast.makeText(this, "The user could not be created.", Toast.LENGTH_SHORT).show()
+            binding.progressBarRegister.visibility = View.GONE
+            Toast.makeText(requireActivity(), "The user could not be created.", Toast.LENGTH_SHORT).show()
             Log.e("performRegister", e.toString())
         }
     }
@@ -82,7 +73,7 @@ class RegisterActivity : AppCompatActivity() {
     private suspend fun saveDb(uId: String, username: String, email: String) {
         val usersCollection = db.collection("users")
         val userId = auth.uid.toString()
-        val detail = UserDetails(editTextUserame.text.toString(), "", 0, 0, "")
+        val detail = UserDetails(binding.editTextUsername.text.toString(), "", 0, 0, "")
         val user = Users(uId, username, email, detail)
 
         try {
@@ -91,7 +82,7 @@ class RegisterActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("saveDb", e.toString())
             Toast.makeText(
-                this,
+                requireActivity(),
                 e.message.toString(),
                 Toast.LENGTH_SHORT
             ).show()
