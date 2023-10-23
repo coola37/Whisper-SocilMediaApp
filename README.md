@@ -1,10 +1,13 @@
 # Whisper-SocilMediaApp
-![Screenshot_1698088622](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/e08a4327-bda7-414a-a95f-936675b9150f)
-![Screenshot_1698088628](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/4ca43061-c681-468b-91fb-4f3e16b257b0)
-![Screenshot_1698088090](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/d34904fe-aebb-4fda-8b2c-5ba050300e3e)
-![Screenshot_1698088466](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/e22296af-c1b3-4376-9f2e-38ea9c995a38)
-![Screenshot_1698088174](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/c83c176d-d37f-4eb5-a1a6-aa5655a599c9)
-![Screenshot_1698088164](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/c42b9bd1-d983-4b65-b8cc-e2afa638ce69)
-![Screenshot_1698088158](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/479734de-d5eb-4809-a77c-f5e4266d4b2d)
-![Screenshot_1698088147](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/660d0782-beb4-4e8c-a702-a30ab8198f7e)
-
+![Screenshot_1698088622](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/98c23449-4408-41e0-ad0d-41e3010bc457)
+![Screenshot_1698088628](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/3bb15e29-7438-4034-bd43-06c30b6456bf)
+![Screenshot_1698088090](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/7a15e99e-0da4-4821-a33a-0989e3e99074)
+![Screenshot_16980
+![Screenshot_1698088466](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/e1dced55-d61a-4a38-9460-91b2d6a97994)
+88941](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/23cffb05-df43-409d-bcbb-4a2602befa20)
+![Screenshot_1698088174](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/638783c1-3742-47f4-9c00-5193d805ac61)
+![Screenshot_1698088158](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/420251c6-bc25-45b3-bfea-21c834cc9825)
+![Screenshot_1698088164](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/fe8108b5-5c39-497a-9427-0fd83b94e177)
+![Screenshot_1698088147](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/3a2b8f37-ae6b-4629-b30b-9a7e7514d547)
+![Screenshot_1698088185](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/5a4d7fe2-10aa-44d3-bd07-f5f439af06bf)
+![Screenshot_1698088153](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/70d988db-4888-491f-955d-fd9bfade77f2)
