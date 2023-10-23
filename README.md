@@ -1,4 +1,9 @@
-# Whisper-SocilMediaApp
+# Whisper
+
+##Purpose
+Whisper is a social media application. It allows instant status sharing and messaging with your followers.
+
+
 ![Screenshot_1698088622](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/98c23449-4408-41e0-ad0d-41e3010bc457)
 ![Screenshot_1698088628](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/3bb15e29-7438-4034-bd43-06c30b6456bf)
 ![Screenshot_1698088090](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/7a15e99e-0da4-4821-a33a-0989e3e99074)
@@ -11,3 +16,17 @@
 ![Screenshot_1698088147](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/3a2b8f37-ae6b-4629-b30b-9a7e7514d547)
 ![Screenshot_1698088185](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/5a4d7fe2-10aa-44d3-bd07-f5f439af06bf)
 ![Screenshot_1698088153](https://github.com/Coola37/Whisper-SocilMediaApp/assets/110453767/70d988db-4888-491f-955d-fd9bfade77f2)
+
+## Libraries and Tools
+Viewmodel </p>
+Livedata</p>
+Lifecycle</p>
+Hilt</p>
+Navigation</p>
+Viewbinding</p>
+Coroutines</p>
+Firebase Firestore Database</p>
+Firebase Authentication</p>
+Glide</p>
+
+
