@@ -11,8 +11,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +28,27 @@ class InboxViewModel @Inject constructor(
     val chatChannels: MutableLiveData<List<ChatChannel>> = MutableLiveData()
     val chatUsers: MutableLiveData<List<Users>> = MutableLiveData()
 
+    private val chatNameMaps : MutableMap<String, ChatChannel> = LinkedHashMap()
+
+    fun search(query: String){
+        if(query.isBlank()){
+            showChatChannels(ArrayList(chatNameMaps.values))
+        }else{
+            launch {
+                val matchedChats = chatNameMaps.keys.filter { it.contains(query, ignoreCase = true) }
+                val matchedChatList: MutableList<ChatChannel> = ArrayList(matchedChats.size)
+                matchedChats.forEach {
+                    matchedChatList.add(chatNameMaps[it]!!)
+                }
+                withContext(Dispatchers.Main){
+                    showChatChannels(matchedChatList)
+                }
+            }
+        }
+    }
+    fun showChatChannels(chatList : List<ChatChannel>){
+        chatChannels.value = chatList
+    }
     suspend fun fetchUserData(userId: String){
             val userDocRef = db.collection("users").document(userId)
             try {
@@ -51,6 +74,8 @@ class InboxViewModel @Inject constructor(
                chatChannelList.add(channel)
            }
            (chatChannels as MutableLiveData<List<ChatChannel>>).postValue(chatChannelList)
+           chatNameMaps.clear()
+           chatNameMaps.putAll(chatChannelList.filter { it.receiverUsername != null}.associateBy{ it.receiverUsername!!})
        }catch (e: Exception){
            Log.e("InboxFragmentFetchChats", e.message.toString())
        }

@@ -56,23 +56,10 @@
                     android:id="@+id/searchViewMessages"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
-                    android:background="@color/fontgrey"
-                    android:text="asdasd"
+                    android:background="#3A3A3A"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/viewTop" />
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/newMsgButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@color/blue"
-                    android:backgroundTint="@color/blue"
-                    android:src="@drawable/ic_action_add"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/msgRecycler"

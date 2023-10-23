@@ -49,7 +49,7 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
     private lateinit var binding : FragmentProfileViewerBinding
     private lateinit var adapter: HomePostsAdapter
     private lateinit var senderId : String
-    private lateinit var checkNavViewmodel: ProfileViewerViewModel
+    private var inMainNav: Boolean? = null
 
 
 
@@ -57,11 +57,11 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentProfileViewerBinding.bind(view)
         viewModel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
-        checkNavViewmodel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
-        checkNavViewmodel.inMainNav.postValue(true)
-        checkNavViewmodel.inSearchNav.postValue(false)
+
+
 
         senderId = requireArguments().getString("senderId").toString()
+        inMainNav = requireArguments().getBoolean("inMainNav")
 
         CoroutineScope(Dispatchers.IO).launch {
             viewModel.fetchUserData(senderId)
@@ -71,19 +71,27 @@ class ProfileViewerFragment : Fragment(R.layout.fragment_profile_viewer) {
         }
 
         binding.imageViewSendMsg.setOnClickListener {
+            if(inMainNav == true){
+                findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2,
+                    bundleOf("senderId" to senderId))
+            }else{
+                findNavController().navigate(R.id.action_profileViewerFragment2_to_chatFragment3,
+                    bundleOf("senderId" to senderId))
+            }
            /* if(){
                 findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2, bundleOf("senderId" to senderId))
             }
             else{
                 findNavController().navigate(R.id.action_profileViewerFragment2_to_chatFragment3)
             }*/
-            checkNavViewmodel.inMainNav.observe(viewLifecycleOwner){
+           /* viewModel.inMainNav.observe(viewLifecycleOwner){
                 if (it){
-                    findNavController().navigate(R.id.action_profileViewerFragment_to_chatFragment2, bundleOf("senderId" to senderId))
+
                 }else{
 
+                    )
                 }
-            }
+            }*/
         }
 
         CoroutineScope(Dispatchers.Main).launch{

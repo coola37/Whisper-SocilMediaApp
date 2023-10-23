@@ -16,6 +16,7 @@ import com.example.anew.adapter.HomePostsAdapter
 import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.databinding.FragmentHomeBinding
 import com.example.anew.viewmodel.HomeViewModel
+import com.example.anew.viewmodel.ProfileViewerViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,13 +38,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var glide: RequestManager
     private lateinit var viewModel: HomeViewModel
     private lateinit var postsAdapter: HomePostsAdapter
-
+    private lateinit var checkNavViewmodel: ProfileViewerViewModel
+    private var inMainNav: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
+        checkNavViewmodel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
+        checkNavViewmodel.inMainNav.postValue(true)
+        checkNavViewmodel.inSearchNav.postValue(false)
 
         setupButtonClick()
 
@@ -63,7 +68,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                             startActivity(intent)
                         }else{
                             findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
-                                bundleOf("senderId" to senderId))
+                                bundleOf("senderId" to senderId, "inMainNav" to inMainNav ))
                         }
 
                     }

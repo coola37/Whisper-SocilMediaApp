@@ -62,7 +62,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
             }, object : OnClickListenerCatchData{
                 override fun onProfileImageClick(senderId: String) {
-                    findNavController().navigate(R.id.action_homeFragment_to_postViewerFragment,
+                    findNavController().navigate(R.id.action_profileFragment_to_postViewerFragment3,
                         bundleOf("postID" to senderId)
                     )
                 }

@@ -6,12 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.anew.R
 import com.example.anew.adapter.ChatChannelAdapter
 import com.example.anew.adapter.OnClickListenerCatchData
@@ -50,7 +52,11 @@ class InboxFragment : Fragment(R.layout.fragment_inbox) {
                viewModel.fetchUserData(auth.uid!!)
                viewModel.fetchChatChannels(auth.uid!!)
            }
+           CoroutineScope(Dispatchers.Main).launch {
+               getUserProfileImg()
+           }
        }
+
 
         viewModel.chatChannels.observe(viewLifecycleOwner){
             adapter = ChatChannelAdapter(it, object : OnClickListenerCatchData{
@@ -62,6 +68,30 @@ class InboxFragment : Fragment(R.layout.fragment_inbox) {
             val manager = LinearLayoutManager(requireContext())
             binding.msgRecycler.layoutManager = manager
             binding.msgRecycler.adapter = adapter
+        }
+
+        binding.searchViewMessages.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.search(newText ?: "")
+                return true
+            }
+
+        })
+    }
+
+    private fun getUserProfileImg(){
+        viewModel.userData.observe(viewLifecycleOwner){
+            glide.load(it.details?.profileImg)
+                .placeholder(R.mipmap.ic_none_img)
+                .error(R.mipmap.ic_none_img)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .into(binding.imageView3)
         }
     }
 }

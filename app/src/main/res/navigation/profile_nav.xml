@@ -14,6 +14,9 @@
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment"
            />
+        <action
+            android:id="@+id/action_profileFragment_to_postViewerFragment3"
+            app:destination="@id/postViewerFragment3" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
@@ -22,6 +25,15 @@
         tools:layout="@layout/fragment_edit_profile" >
         <action
             android:id="@+id/action_editProfileFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/postViewerFragment3"
+        android:name="com.example.anew.view.PostViewerFragment"
+        android:label="fragment_post_viewer"
+        tools:layout="@layout/fragment_post_viewer" >
+        <action
+            android:id="@+id/action_postViewerFragment3_to_profileFragment"
             app:destination="@id/profileFragment" />
     </fragment>
 </navigation>

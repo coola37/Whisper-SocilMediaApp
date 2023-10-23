@@ -16,6 +16,7 @@ import com.example.anew.R
 import com.example.anew.adapter.OnClickListenerCatchData
 import com.example.anew.adapter.UsersAdapter
 import com.example.anew.databinding.FragmentSearchBinding
+import com.example.anew.viewmodel.ProfileViewerViewModel
 import com.example.anew.viewmodel.SearchViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,10 +40,15 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private lateinit var adapter: UsersAdapter
     private lateinit var viewModel : SearchViewModel
     private var imgUrl : String = ""
+    private lateinit var checkNavViewmodel: ProfileViewerViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
         viewModel = ViewModelProvider(this)[SearchViewModel::class.java]
+
+        checkNavViewmodel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
+        checkNavViewmodel.inMainNav.postValue(false)
+        checkNavViewmodel.inSearchNav.postValue(true)
 
         CoroutineScope(Dispatchers.IO).launch{
             viewModel.fetchUsers()
