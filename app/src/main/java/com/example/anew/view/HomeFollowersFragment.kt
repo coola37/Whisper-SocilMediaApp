@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -69,37 +71,13 @@ class HomeFollowersFragment : Fragment(R.layout.fragment_home_followers) {
 
            adapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData {
                override fun onProfileImageClick(senderId: String) {
-                   if(senderId == auth.uid){
-                       val intent = Intent(requireContext(), ProfileActivity::class.java)
-                       startActivity(intent)
-                   }else{
-                       findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
-                           bundleOf("senderId" to senderId)
-                       )
-                   }
-
+                 profileNavigation(senderId)
                }
            }, object : OnClickListenerCatchData {
                override fun onProfileImageClick(senderId: String) {
                    CoroutineScope(Dispatchers.IO).launch { viewModel.checkLike(senderId) }
                    viewModel.checkLike.observe(viewLifecycleOwner){
-                       if(it){
-                           viewModel.disLike(senderId)
-                           CoroutineScope(Dispatchers.Main).launch {
-                               viewModel.refreshPostData(followedUserList)
-                               viewModel.postsData.observe(viewLifecycleOwner){
-                                   adapter.setData(it)
-                               }
-                           }
-                       }else{
-                           viewModel.like(senderId)
-                           CoroutineScope(Dispatchers.Main).launch {
-                               viewModel.refreshPostData(followedUserList)
-                               viewModel.postsData.observe(viewLifecycleOwner){
-                                   adapter.setData(it)
-                               }
-                           }
-                       }
+                    likeDislke(it, senderId)
                    }
                }
 
@@ -111,16 +89,49 @@ class HomeFollowersFragment : Fragment(R.layout.fragment_home_followers) {
                }
            })
        }
+        getPostsData()
 
-        viewModel.postsData.observe(viewLifecycleOwner){
+    }
+
+    private fun profileNavigation(senderId: String){
+        if(senderId == auth.uid){
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }else{
+            findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
+                bundleOf("senderId" to senderId)
+            )
+        }
+    }
+
+    private fun likeDislke(it: Boolean, postId:String) {
+        if (it) {
+            viewModel.disLike(postId)
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.refreshPostData(followedUserList)
+                viewModel.postsData.observe(viewLifecycleOwner) {
+                    adapter.setData(it)
+                }
+            }
+        } else {
+            viewModel.like(postId)
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.refreshPostData(followedUserList)
+                viewModel.postsData.observe(viewLifecycleOwner) {
+                    adapter.setData(it)
+                }
+            }
+        }
+    }
+
+    private fun getPostsData() {
+        viewModel.postsData.observe(viewLifecycleOwner) {
             adapter.setData(it)
             val layoutManager = LinearLayoutManager(requireContext())
             binding.homeRecycler.layoutManager = layoutManager
             binding.homeRecycler.adapter = adapter
         }
     }
-
-
 
     private fun setupButtonClick(){
         binding.circleImage.setOnClickListener {

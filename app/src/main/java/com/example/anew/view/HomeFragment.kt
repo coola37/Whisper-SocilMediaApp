@@ -18,6 +18,7 @@ import com.example.anew.databinding.FragmentHomeBinding
 import com.example.anew.viewmodel.HomeViewModel
 import com.example.anew.viewmodel.ProfileViewerViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -38,17 +39,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     lateinit var glide: RequestManager
     private lateinit var viewModel: HomeViewModel
     private lateinit var postsAdapter: HomePostsAdapter
-    private lateinit var checkNavViewmodel: ProfileViewerViewModel
     private var inMainNav: Boolean = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-
-        checkNavViewmodel = ViewModelProvider(this)[ProfileViewerViewModel::class.java]
-        checkNavViewmodel.inMainNav.postValue(true)
-        checkNavViewmodel.inSearchNav.postValue(false)
 
         setupButtonClick()
 
@@ -60,39 +56,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
 
             CoroutineScope(Dispatchers.Main).launch{
-                fetchUserData()
+                getUserData()
                 postsAdapter = HomePostsAdapter(emptyList(), object : OnClickListenerCatchData{
                     override fun onProfileImageClick(senderId: String) {
-                        if(senderId == auth.uid){
-                            val intent = Intent(requireContext(), ProfileActivity::class.java)
-                            startActivity(intent)
-                        }else{
-                            findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
-                                bundleOf("senderId" to senderId, "inMainNav" to inMainNav ))
-                        }
-
+                       profileNavigation(senderId)
                     }
                 }, object : OnClickListenerCatchData{
                     override fun onProfileImageClick(senderId: String) {
                         CoroutineScope(Dispatchers.IO).launch { viewModel.checkLike(senderId) }
                         viewModel.checkLike.observe(viewLifecycleOwner){
-                            if(it){
-                                viewModel.disLike(senderId)
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    viewModel.refreshPostData()
-                                    viewModel.postsData.observe(viewLifecycleOwner){
-                                        postsAdapter.setData(it)
-                                    }
-                                }
-                            }else{
-                                viewModel.like(senderId)
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    viewModel.refreshPostData()
-                                    viewModel.postsData.observe(viewLifecycleOwner){
-                                        postsAdapter.setData(it)
-                                    }
-                                }
-                            }
+                            likeDislike(it, senderId)
                         }
                     }
 
@@ -103,22 +76,58 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     }
                 })
 
-                viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
-                    postsAdapter.setData(postsList)
-
-                    val layoutManager = LinearLayoutManager(requireContext())
-                    binding.homeRecycler.layoutManager = layoutManager
-                    binding.homeRecycler.adapter = postsAdapter
-
-                }
+                getPostData()
             }
         }
-
     }
 
+    private fun getPostData(){
+        viewModel.postsData.observe(viewLifecycleOwner) { postsList ->
+            postsAdapter.setData(postsList)
 
+            val layoutManager = LinearLayoutManager(requireContext())
+            binding.homeRecycler.layoutManager = layoutManager
+            binding.homeRecycler.adapter = postsAdapter
 
+        }
+    }
+    private fun profileNavigation(senderId: String){
+        if(senderId == auth.uid){
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }else{
+            findNavController().navigate(R.id.action_homeFragment_to_profileViewerFragment,
+                bundleOf("senderId" to senderId, "inMainNav" to inMainNav ))
+        }
+    }
 
+    private fun likeDislike(it: Boolean, postId: String){
+        if(it){
+            try {
+                viewModel.disLike(postId)
+                CoroutineScope(Dispatchers.Main).launch {
+                    viewModel.refreshPostData()
+                    viewModel.postsData.observe(viewLifecycleOwner){
+                        postsAdapter.setData(it)
+                    }
+                }
+            }catch (e:Exception){
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
+        }else{
+            try {
+                viewModel.like(postId)
+                CoroutineScope(Dispatchers.Main).launch {
+                    viewModel.refreshPostData()
+                    viewModel.postsData.observe(viewLifecycleOwner){
+                        postsAdapter.setData(it)
+                    }
+                }
+            }catch (e:Exception){
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
+        }
+    }
     private fun setupButtonClick(){
         binding.circleImage.setOnClickListener {
             val intent = Intent(requireContext(), ProfileActivity::class.java)
@@ -131,7 +140,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             findNavController().navigate(R.id.action_homeFragment_to_homeFollowersFragment)
         }
     }
-    private fun fetchUserData() {
+    private fun getUserData() {
 
         viewModel.userData.observe(viewLifecycleOwner) { user ->
             glide.load(user.details?.profileImg)
