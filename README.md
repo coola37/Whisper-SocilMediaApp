@@ -1,6 +1,7 @@
 # Whisper
 
-##Purpose
+## Purpose
+
 Whisper is a social media application. It allows instant status sharing and messaging with your followers.
 
 
